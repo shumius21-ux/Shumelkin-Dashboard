@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления Шумелкина</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f6f8fa;
+            color: #24292f;
+        }
+        h1 {
+            border-bottom: 2px solid #d0d7de;
+            padding-bottom: 10px;
+        }
+        .nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .card h2 {
+            margin: 0 0 8px 0;
+            color: #0969da;
+        }
+        .card p {
+            margin: 0;
+            color: #57606a;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Панель управления Шумелкина</h1>
+    <p>Аналитический дашборд: воронка, юнит-экономика, анализ конкурентов.</p>
+
+    <div class="nav">
+        <a href="Воронка.html" class="card">
+            <h2>📊 Воронка</h2>
+            <p>Анализ воронки продаж и конверсий</p>
+        </a>
+        <a href="Юнит-экономика.html" class="card">
+            <h2>💰 Юнит-экономика</h2>
+            <p>Расчёт unit-экономики проекта</p>
+        </a>
+        <a href="Анализ конкурентов.html" class="card">
+            <h2>🔍 Анализ конкурентов</h2>
+            <p>Сравнительный анализ конкурентов</p>
+        </a>
+    </div>
+</body>
+</html>
