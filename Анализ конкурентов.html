@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Анализ конкурентов — демо для портфолио</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:#0f1419; --panel:#1a2332; --panel2:#243044; --border:#2d3a4f;
+    --text:#e7ecf3; --muted:#8b9bb4; --accent:#3b82f6;
+    --green:#22c55e; --yellow:#eab308; --orange:#f97316; --red:#ef4444; --cyan:#06b6d4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .header{background:linear-gradient(135deg,#1a2332,#0f172a);border-bottom:1px solid var(--border);
+    padding:16px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+  .header h1{font-size:1.25rem;font-weight:650}
+  .header .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+  .badge{background:var(--panel2);border:1px solid var(--border);color:var(--cyan);padding:8px 16px;border-radius:8px;font-size:1.05rem;font-weight:650}
+  .tabs{display:flex;gap:4px;padding:12px 24px 0;border-bottom:1px solid var(--border);overflow-x:auto}
+  .tab{background:transparent;border:none;color:var(--muted);padding:10px 18px;cursor:pointer;font-size:.9rem;border-radius:8px 8px 0 0;white-space:nowrap}
+  .tab:hover{color:var(--text);background:var(--panel)}
+  .tab.active{color:var(--text);background:var(--panel);border:1px solid var(--border);border-bottom-color:var(--panel);margin-bottom:-1px}
+  .panel{display:none;padding:20px 24px 40px;animation:fade .2s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .kpi .label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .kpi .value{font-size:1.35rem;font-weight:700;margin-top:6px}
+  .kpi .hint{color:var(--muted);font-size:.78rem;margin-top:4px}
+  .kpi.accent .value{color:var(--accent)} .kpi.green .value{color:var(--green)}
+  .kpi.orange .value{color:var(--orange)} .kpi.red .value{color:var(--red)} .kpi.cyan .value{color:var(--cyan)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .card h3{font-size:.95rem;margin-bottom:12px;font-weight:600}
+  .chart-wrap{position:relative;height:260px}
+  .insights{display:grid;gap:10px}
+  .insight{background:var(--panel2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;font-size:.9rem}
+  .insight.warn{border-left-color:var(--orange)} .insight.ok{border-left-color:var(--green)} .insight.danger{border-left-color:var(--red)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center}
+  .toolbar input,.toolbar select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem}
+  .table-wrap{overflow:auto;max-height:70vh;border:1px solid var(--border);border-radius:12px}
+  table{width:100%;border-collapse:collapse;font-size:.8rem}
+  th{position:sticky;top:0;background:var(--panel2);text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1}
+  td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
+  tr:hover td{background:rgba(59,130,246,.06)}
+  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600}
+  .tag-hold{background:#14532d;color:#86efac} .tag-lower{background:#450a0a;color:#fca5a5}
+  .tag-raise{background:#1e3a5f;color:#93c5fd} .tag-promo{background:#431407;color:#fdba74} .tag-other{background:#27272a;color:#a1a1aa}
+  .tag-up{background:#14532d;color:#86efac} .tag-down{background:#450a0a;color:#fca5a5}
+  .money{font-variant-numeric:tabular-nums} .muted{color:var(--muted)}
+  .pos{color:#86efac} .neg{color:#fca5a5}
+  .prio-list{display:grid;gap:8px}
+  .prio-item{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+  .prio-item .num{width:32px;height:32px;background:var(--panel2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+  .comp-grid{display:grid;gap:12px}
+  .comp-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .comp-card h4{font-size:.95rem;margin-bottom:8px}
+  .comp-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+  .comp-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+  <div style="background:linear-gradient(90deg,#7c2d12,#9a3412);color:#fef3c7;padding:14px 24px;text-align:center;font-weight:700;font-size:1.05rem;letter-spacing:0.02em;border-bottom:2px solid #ea580c;">
+    ⚠ ДАННЫЕ ВЫМЫШЛЕННЫЕ · ДЕМОНСТРАЦИЯ ДЛЯ ПОРТФОЛИО · НЕ РЕАЛЬНЫЕ ПОКАЗАТЕЛИ
+  </div>
+
+<div class="header">
+  <div>
+    <h1>Анализ конкурентов · доля, цена, рекомендации</h1>
+    <div class="sub">Автолига · бренды · топ-3 конкурента · динамика и автоматические выводы</div>
+  </div>
+  <div class="badge">Портфолио — Шумелкин Е. А.</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="main">Обзор</button>
+  <button class="tab" data-tab="brands">Бренды и динамика</button>
+  <button class="tab" data-tab="tops">Топ-3 конкуренты</button>
+  <button class="tab" data-tab="actions">Рекомендации</button>
+  <button class="tab" data-tab="method">Методика</button>
+</div>
+
+<div id="main" class="panel active">
+  <div class="kpi-row">
+    <div class="kpi accent"><div class="label">Брендов в срезе</div><div class="value" id="k-n">—</div><div class="hint">июльский контур</div></div>
+    <div class="kpi green"><div class="label">Удерживать цену</div><div class="value" id="k-hold">—</div><div class="hint">доля растёт / стабильна</div></div>
+    <div class="kpi red"><div class="label">Снижать цену</div><div class="value" id="k-lower">—</div><div class="hint">цена выше, доля падает</div></div>
+    <div class="kpi cyan"><div class="label">Можно повышать</div><div class="value" id="k-raise">—</div><div class="hint">цена ниже, доля растёт</div></div>
+    <div class="kpi orange"><div class="label">Усилить продвижение</div><div class="value" id="k-promo">—</div><div class="hint">доля падает при низкой цене</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Рекомендации по брендам</h3><div class="chart-wrap"><canvas id="cRec"></canvas></div></div>
+    <div class="card"><h3>Тренд выручки (2 недели)</h3><div class="chart-wrap"><canvas id="cTrend"></canvas></div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Топ брендов по выручке (неделя)</h3><div class="chart-wrap"><canvas id="cTop"></canvas></div></div>
+    <div class="card">
+      <h3>Ключевые выводы</h3>
+      <div class="insights">
+        <div class="insight ok">Где цена выше рынка, но доля растёт — удерживать позиции, не демпинговать без нужды.</div>
+        <div class="insight danger">Где цена выше, а доля падает — приоритет на снижение цены или пересмотр ассортимента внутри бренда.</div>
+        <div class="insight warn">Где цена ниже, но доля всё равно падает — проблема не в цене: карточка, наличие, продвижение.</div>
+        <div class="insight">Система даёт не просто «кто конкурент», а действие: удерживать / снижать / повышать / усиливать продвижение.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="brands" class="panel">
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="Поиск бренда…">
+    <select id="fRec">
+      <option value="">Рекомендация: все</option>
+      <option value="hold">Удерживать</option>
+      <option value="lower">Снижать цену</option>
+      <option value="raise">Повышать цену</option>
+      <option value="promo">Усилить продвижение</option>
+    </select>
+    <span class="muted" id="rowCount"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Бренд</th><th>Выручка</th><th>Шт</th><th>Ср. цена</th><th>Доля %</th>
+          <th>Отнош. цен</th><th>Δ выр. %</th><th>Δ доли п.п.</th><th>Тренд</th><th>Рекомендация</th>
+        </tr>
+      </thead>
+      <tbody id="brandBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="tops" class="panel">
+  <p class="muted" style="margin-bottom:14px;font-size:.9rem">Срез на 13.09.2026 · Автолига vs топ-3 конкурента по ключевым брендам</p>
+  <div class="comp-grid" id="compGrid"></div>
+</div>
+
+<div id="actions" class="panel">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Снижать цену</h3>
+      <div class="prio-list" id="listLower"></div>
+    </div>
+    <div class="card">
+      <h3>Усилить продвижение</h3>
+      <div class="prio-list" id="listPromo"></div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <h3>Можно повышать цену</h3>
+      <div class="prio-list" id="listRaise"></div>
+    </div>
+    <div class="card">
+      <h3>Удерживать позиции</h3>
+      <div class="prio-list" id="listHold"></div>
+    </div>
+  </div>
+</div>
+
+<div id="method" class="panel">
+  <div class="card">
+    <h3>Методика</h3>
+    <div class="insights" style="margin-top:12px">
+      <div class="insight"><strong>Доля рынка</strong> — выручка Автолиги / выручка рынка по бренду за неделю.</div>
+      <div class="insight"><strong>Отношение цен</strong> — средняя цена Автолиги / средняя цена конкурентов. &gt;1 = дороже рынка.</div>
+      <div class="insight"><strong>Динамика</strong> — сравнение двух последних недель: выручка, штуки, цена, доля.</div>
+      <div class="insight warn"><strong>Автовыводы:</strong> цена выше + доля падает → снижать; цена ниже + доля растёт → можно повышать; цена ниже + доля падает → не цена, а продвижение/карточка.</div>
+      <div class="insight ok"><strong>Топ-3</strong> — кто реально забирает деньги по бренду, с долями и средними ценами.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"brands":[{"brand":"AURORA","w1_rev":5834557.3,"w2_rev":6099764.4,"w3_rev":6298669.8,"w4_rev":6630178.7,"w1_share":64.7,"w4_share":68.1,"w4_price":1500,"w4_price_rel":1.1,"w4_qty":3074,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":3.4,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TECHLINE","w1_rev":491066.3,"w2_rev":513387.5,"w3_rev":530128.4,"w4_rev":558029.9,"w1_share":5.4,"w4_share":5.7,"w4_price":1537,"w4_price_rel":1.25,"w4_qty":427,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.3,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STEELRUN","w1_rev":406279.7,"w2_rev":424747.0,"w3_rev":438597.4,"w4_rev":461681.5,"w1_share":4.5,"w4_share":4.7,"w4_price":1574,"w4_price_rel":1.4,"w4_qty":288,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NEXUS","w1_rev":301174.1,"w2_rev":314863.8,"w3_rev":325131.1,"w4_rev":342243.3,"w1_share":3.3,"w4_share":3.5,"w4_price":1611,"w4_price_rel":1.55,"w4_qty":209,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"DYNAMIX","w1_rev":260688.4,"w2_rev":272537.9,"w3_rev":281425.0,"w4_rev":296236.8,"w1_share":2.8,"w4_share":3.0,"w4_price":1648,"w4_price_rel":1.7,"w4_qty":615,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VOLTRON","w1_rev":234329.5,"w2_rev":244980.8,"w3_rev":252969.3,"w4_rev":266283.5,"w1_share":2.6,"w4_share":2.7,"w4_price":1685,"w4_price_rel":1.1,"w4_qty":165,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PRIMEAUTO","w1_rev":120185.8,"w2_rev":125648.8,"w3_rev":129746.1,"w4_rev":136574.8,"w1_share":1.3,"w4_share":1.4,"w4_price":1722,"w4_price_rel":1.25,"w4_qty":36,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"OPTIMA","w1_rev":119278.6,"w2_rev":124700.4,"w3_rev":128766.7,"w4_rev":135543.9,"w1_share":1.3,"w4_share":1.4,"w4_price":1759,"w4_price_rel":1.4,"w4_qty":39,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PROTECTA","w1_rev":116997.3,"w2_rev":122315.4,"w3_rev":126303.9,"w4_rev":132951.5,"w1_share":1.3,"w4_share":1.4,"w4_price":1796,"w4_price_rel":1.55,"w4_qty":51,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TITAN","w1_rev":107289.2,"w2_rev":112165.9,"w3_rev":115823.5,"w4_rev":121919.5,"w1_share":1.2,"w4_share":1.3,"w4_price":1833,"w4_price_rel":1.7,"w4_qty":65,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"SPEEDFIX","w1_rev":104606.6,"w2_rev":109361.4,"w3_rev":112927.5,"w4_rev":118871.1,"w1_share":1.1,"w4_share":1.2,"w4_price":1870,"w4_price_rel":1.1,"w4_qty":101,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"FORCEPRO","w1_rev":70025.6,"w2_rev":73208.6,"w3_rev":75595.9,"w4_rev":79574.6,"w1_share":0.8,"w4_share":0.8,"w4_price":1907,"w4_price_rel":1.25,"w4_qty":10,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AUTOLUX","w1_rev":38761.6,"w2_rev":40523.5,"w3_rev":41844.9,"w4_rev":44047.3,"w1_share":0.5,"w4_share":0.5,"w4_price":1944,"w4_price_rel":1.4,"w4_qty":56,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"EUROPART","w1_rev":38163.3,"w2_rev":39898.0,"w3_rev":41199.0,"w4_rev":43367.4,"w1_share":0.4,"w4_share":0.4,"w4_price":1981,"w4_price_rel":1.55,"w4_qty":7,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"RALLYX","w1_rev":36502.0,"w2_rev":38161.1,"w3_rev":39405.5,"w4_rev":41479.5,"w1_share":0.4,"w4_share":0.4,"w4_price":2018,"w4_price_rel":1.7,"w4_qty":74,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"GEARMAX","w1_rev":27973.8,"w2_rev":29245.3,"w3_rev":30199.0,"w4_rev":31788.4,"w1_share":0.3,"w4_share":0.3,"w4_price":2055,"w4_price_rel":1.1,"w4_qty":59,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"MAXDRIVE","w1_rev":27569.0,"w2_rev":28822.1,"w3_rev":29762.0,"w4_rev":31328.4,"w1_share":0.3,"w4_share":0.3,"w4_price":2092,"w4_price_rel":1.25,"w4_qty":35,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"HARDCORE","w1_rev":25867.8,"w2_rev":27043.6,"w3_rev":27925.4,"w4_rev":29395.2,"w1_share":0.3,"w4_share":0.3,"w4_price":2129,"w4_price_rel":1.4,"w4_qty":10,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"QUANTUM","w1_rev":21962.4,"w2_rev":22960.7,"w3_rev":23709.4,"w4_rev":24957.3,"w1_share":0.3,"w4_share":0.3,"w4_price":2166,"w4_price_rel":1.55,"w4_qty":10,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"ULTRALINE","w1_rev":21342.3,"w2_rev":22312.4,"w3_rev":23040.0,"w4_rev":24252.6,"w1_share":0.2,"w4_share":0.2,"w4_price":2203,"w4_price_rel":1.7,"w4_qty":16,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"CORETECH","w1_rev":20349.2,"w2_rev":21274.2,"w3_rev":21967.9,"w4_rev":23124.1,"w1_share":0.2,"w4_share":0.2,"w4_price":2240,"w4_price_rel":1.1,"w4_qty":16,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"MEGAPART","w1_rev":18440.8,"w2_rev":19279.0,"w3_rev":19907.6,"w4_rev":20955.4,"w1_share":0.2,"w4_share":0.2,"w4_price":2277,"w4_price_rel":1.25,"w4_qty":3,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AXIOM","w1_rev":14566.6,"w2_rev":15228.7,"w3_rev":15725.3,"w4_rev":16552.9,"w1_share":0.2,"w4_share":0.2,"w4_price":2314,"w4_price_rel":1.4,"w4_qty":11,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"SOLIDAX","w1_rev":13908.4,"w2_rev":14540.6,"w3_rev":15014.8,"w4_rev":15805.0,"w1_share":0.2,"w4_share":0.2,"w4_price":2351,"w4_price_rel":1.55,"w4_qty":8,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NOVA","w1_rev":13009.4,"w2_rev":13600.7,"w3_rev":14044.2,"w4_rev":14783.4,"w1_share":0.2,"w4_share":0.2,"w4_price":2388,"w4_price_rel":1.7,"w4_qty":6,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"RAPID","w1_rev":12629.2,"w2_rev":13203.3,"w3_rev":13633.8,"w4_rev":14351.4,"w1_share":0.1,"w4_share":0.1,"w4_price":2425,"w4_price_rel":1.1,"w4_qty":6,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"FORGE","w1_rev":8246.5,"w2_rev":8621.3,"w3_rev":8902.4,"w4_rev":9371.0,"w1_share":0.1,"w4_share":0.1,"w4_price":2462,"w4_price_rel":1.25,"w4_qty":19,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"POWERGEAR","w1_rev":6415.1,"w2_rev":6706.7,"w3_rev":6925.4,"w4_rev":7289.9,"w1_share":0.1,"w4_share":0.1,"w4_price":2499,"w4_price_rel":1.4,"w4_qty":3,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AUTOSHIELD","w1_rev":6080.4,"w2_rev":6356.7,"w3_rev":6564.0,"w4_rev":6909.5,"w1_share":0.1,"w4_share":0.1,"w4_price":2536,"w4_price_rel":1.55,"w4_qty":11,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STELLAR","w1_rev":5562.6,"w2_rev":5815.4,"w3_rev":6005.0,"w4_rev":6321.1,"w1_share":0.1,"w4_share":0.1,"w4_price":2573,"w4_price_rel":1.7,"w4_qty":4,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VERTEX","w1_rev":5015.6,"w2_rev":5243.5,"w3_rev":5414.5,"w4_rev":5699.5,"w1_share":0.1,"w4_share":0.1,"w4_price":2610,"w4_price_rel":1.1,"w4_qty":1,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"OMEGA","w1_rev":4643.7,"w2_rev":4854.7,"w3_rev":5013.1,"w4_rev":5276.9,"w1_share":0.1,"w4_share":0.1,"w4_price":2647,"w4_price_rel":1.25,"w4_qty":1,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"APEX","w1_rev":4003.9,"w2_rev":4185.9,"w3_rev":4322.4,"w4_rev":4549.9,"w1_share":0.0,"w4_share":0.0,"w4_price":2684,"w4_price_rel":1.4,"w4_qty":1,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"IRONCLAD","w1_rev":3734.7,"w2_rev":3904.5,"w3_rev":4031.8,"w4_rev":4244.0,"w1_share":0.0,"w4_share":0.0,"w4_price":2721,"w4_price_rel":1.55,"w4_qty":3,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"DRIVEON","w1_rev":3646.2,"w2_rev":3811.9,"w3_rev":3936.2,"w4_rev":4143.4,"w1_share":0.0,"w4_share":0.0,"w4_price":2758,"w4_price_rel":1.7,"w4_qty":1,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PARTZONE","w1_rev":3415.7,"w2_rev":3571.0,"w3_rev":3687.4,"w4_rev":3881.5,"w1_share":0.0,"w4_share":0.0,"w4_price":2795,"w4_price_rel":1.1,"w4_qty":3,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"METALPRO","w1_rev":3350.4,"w2_rev":3502.7,"w3_rev":3616.9,"w4_rev":3807.3,"w1_share":0.0,"w4_share":0.0,"w4_price":2832,"w4_price_rel":1.25,"w4_qty":23,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"LUMEN","w1_rev":2763.1,"w2_rev":2888.7,"w3_rev":2982.9,"w4_rev":3139.9,"w1_share":0.0,"w4_share":0.0,"w4_price":2869,"w4_price_rel":1.4,"w4_qty":3,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TORQUE","w1_rev":2709.0,"w2_rev":2832.1,"w3_rev":2924.5,"w4_rev":3078.4,"w1_share":0.0,"w4_share":0.0,"w4_price":2906,"w4_price_rel":1.55,"w4_qty":1,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VELOCITY","w1_rev":2418.7,"w2_rev":2528.6,"w3_rev":2611.1,"w4_rev":2748.5,"w1_share":0.0,"w4_share":0.0,"w4_price":2943,"w4_price_rel":1.7,"w4_qty":2,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"CHRONOS","w1_rev":2339.6,"w2_rev":2445.9,"w3_rev":2525.7,"w4_rev":2658.6,"w1_share":0.0,"w4_share":0.0,"w4_price":2980,"w4_price_rel":1.1,"w4_qty":18,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PULSE","w1_rev":2335.3,"w2_rev":2441.5,"w3_rev":2521.1,"w4_rev":2653.8,"w1_share":0.0,"w4_share":0.0,"w4_price":3017,"w4_price_rel":1.25,"w4_qty":1,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NEXGEN","w1_rev":1979.3,"w2_rev":2069.3,"w3_rev":2136.7,"w4_rev":2249.2,"w1_share":0.0,"w4_share":0.0,"w4_price":3054,"w4_price_rel":1.4,"w4_qty":1,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STRATOS","w1_rev":1764.4,"w2_rev":1844.6,"w3_rev":1904.8,"w4_rev":2005.0,"w1_share":0.0,"w4_share":0.0,"w4_price":3091,"w4_price_rel":1.55,"w4_qty":4,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"}],"tops":[{"brand":"AURORA","rank":"Топ-1","competitor":"АвтоМарт","our_rev":6630178.7,"comp_rev":2652071.5,"our_share":68.1,"comp_share":20.4,"our_price":1500,"comp_price":1200.0},{"brand":"AURORA","rank":"Топ-2","competitor":"ПартПро","our_rev":6630178.7,"comp_rev":3646598.3,"our_share":68.1,"comp_share":27.2,"our_price":1500,"comp_price":1500.0},{"brand":"AURORA","rank":"Топ-3","competitor":"МоторЛайн","our_rev":6630178.7,"comp_rev":4641125.1,"our_share":68.1,"comp_share":34.0,"our_price":1500,"comp_price":1800.0},{"brand":"TECHLINE","rank":"Топ-1","competitor":"ПартПро","our_rev":558029.9,"comp_rev":223212.0,"our_share":5.7,"comp_share":1.7,"our_price":1537,"comp_price":1229.6},{"brand":"TECHLINE","rank":"Топ-2","competitor":"МоторЛайн","our_rev":558029.9,"comp_rev":306916.4,"our_share":5.7,"comp_share":2.3,"our_price":1537,"comp_price":1537.0},{"brand":"TECHLINE","rank":"Топ-3","competitor":"СнабТрейд","our_rev":558029.9,"comp_rev":390620.9,"our_share":5.7,"comp_share":2.9,"our_price":1537,"comp_price":1844.4},{"brand":"STEELRUN","rank":"Топ-1","competitor":"МоторЛайн","our_rev":461681.5,"comp_rev":184672.6,"our_share":4.7,"comp_share":1.4,"our_price":1574,"comp_price":1259.2},{"brand":"STEELRUN","rank":"Топ-2","competitor":"СнабТрейд","our_rev":461681.5,"comp_rev":253924.8,"our_share":4.7,"comp_share":1.9,"our_price":1574,"comp_price":1574.0},{"brand":"STEELRUN","rank":"Топ-3","competitor":"ДетальМаркет","our_rev":461681.5,"comp_rev":323177.0,"our_share":4.7,"comp_share":2.4,"our_price":1574,"comp_price":1888.8},{"brand":"NEXUS","rank":"Топ-1","competitor":"СнабТрейд","our_rev":342243.3,"comp_rev":136897.3,"our_share":3.5,"comp_share":1.1,"our_price":1611,"comp_price":1288.8},{"brand":"NEXUS","rank":"Топ-2","competitor":"ДетальМаркет","our_rev":342243.3,"comp_rev":188233.8,"our_share":3.5,"comp_share":1.4,"our_price":1611,"comp_price":1611.0},{"brand":"NEXUS","rank":"Топ-3","competitor":"ТехноСклад","our_rev":342243.3,"comp_rev":239570.3,"our_share":3.5,"comp_share":1.8,"our_price":1611,"comp_price":1933.2},{"brand":"DYNAMIX","rank":"Топ-1","competitor":"ДетальМаркет","our_rev":296236.8,"comp_rev":118494.7,"our_share":3.0,"comp_share":0.9,"our_price":1648,"comp_price":1318.4},{"brand":"DYNAMIX","rank":"Топ-2","competitor":"ТехноСклад","our_rev":296236.8,"comp_rev":162930.2,"our_share":3.0,"comp_share":1.2,"our_price":1648,"comp_price":1648.0},{"brand":"DYNAMIX","rank":"Топ-3","competitor":"АвтоОпт","our_rev":296236.8,"comp_rev":207365.8,"our_share":3.0,"comp_share":1.5,"our_price":1648,"comp_price":1977.6},{"brand":"VOLTRON","rank":"Топ-1","competitor":"ТехноСклад","our_rev":266283.5,"comp_rev":106513.4,"our_share":2.7,"comp_share":0.8,"our_price":1685,"comp_price":1348.0},{"brand":"VOLTRON","rank":"Топ-2","competitor":"АвтоОпт","our_rev":266283.5,"comp_rev":146455.9,"our_share":2.7,"comp_share":1.1,"our_price":1685,"comp_price":1685.0},{"brand":"VOLTRON","rank":"Топ-3","competitor":"ПрофиПартс","our_rev":266283.5,"comp_rev":186398.4,"our_share":2.7,"comp_share":1.4,"our_price":1685,"comp_price":2022.0},{"brand":"PRIMEAUTO","rank":"Топ-1","competitor":"АвтоОпт","our_rev":136574.8,"comp_rev":54629.9,"our_share":1.4,"comp_share":0.4,"our_price":1722,"comp_price":1377.6},{"brand":"PRIMEAUTO","rank":"Топ-2","competitor":"ПрофиПартс","our_rev":136574.8,"comp_rev":75116.1,"our_share":1.4,"comp_share":0.6,"our_price":1722,"comp_price":1722.0},{"brand":"PRIMEAUTO","rank":"Топ-3","competitor":"РейтингАвто","our_rev":136574.8,"comp_rev":95602.4,"our_share":1.4,"comp_share":0.7,"our_price":1722,"comp_price":2066.4},{"brand":"OPTIMA","rank":"Топ-1","competitor":"ПрофиПартс","our_rev":135543.9,"comp_rev":54217.6,"our_share":1.4,"comp_share":0.4,"our_price":1759,"comp_price":1407.2},{"brand":"OPTIMA","rank":"Топ-2","competitor":"РейтингАвто","our_rev":135543.9,"comp_rev":74549.1,"our_share":1.4,"comp_share":0.6,"our_price":1759,"comp_price":1759.0},{"brand":"OPTIMA","rank":"Топ-3","competitor":"Скорость+","our_rev":135543.9,"comp_rev":94880.7,"our_share":1.4,"comp_share":0.7,"our_price":1759,"comp_price":2110.8}],"summary":[{"brand":"AURORA","our_rev":6630178.7,"our_qty":3074,"our_share":68.1,"our_price":1500,"comp_avg_price":1350.0,"price_rel":1.1,"market_rev":9735945.2,"t1_name":"АвтоМарт","t1_rev":3646598.3,"t1_share":27.2,"t1_price":1650.0,"t2_name":"ПартПро","t2_rev":2320562.5,"t2_share":17.0,"t2_price":1275.0,"t3_name":"МоторЛайн","t3_rev":1458639.3,"t3_share":10.2,"t3_price":1425.0},{"brand":"TECHLINE","our_rev":558029.9,"our_qty":427,"our_share":5.7,"our_price":1537,"comp_avg_price":1383.3,"price_rel":1.25,"market_rev":9789998.2,"t1_name":"ПартПро","t1_rev":306916.4,"t1_share":2.3,"t1_price":1690.7,"t2_name":"МоторЛайн","t2_rev":195310.5,"t2_share":1.4,"t2_price":1306.5,"t3_name":"СнабТрейд","t3_rev":122766.6,"t3_share":0.9,"t3_price":1460.1},{"brand":"STEELRUN","our_rev":461681.5,"our_qty":288,"our_share":4.7,"our_price":1574,"comp_avg_price":1416.6,"price_rel":1.4,"market_rev":9823010.6,"t1_name":"МоторЛайн","t1_rev":253924.8,"t1_share":1.9,"t1_price":1731.4,"t2_name":"СнабТрейд","t2_rev":161588.5,"t2_share":1.2,"t2_price":1337.9,"t3_name":"ДетальМаркет","t3_rev":101569.9,"t3_share":0.7,"t3_price":1495.3},{"brand":"NEXUS","our_rev":342243.3,"our_qty":209,"our_share":3.5,"our_price":1611,"comp_avg_price":1449.9,"price_rel":1.55,"market_rev":9778380.0,"t1_name":"СнабТрейд","t1_rev":188233.8,"t1_share":1.4,"t1_price":1772.1,"t2_name":"ДетальМаркет","t2_rev":119785.2,"t2_share":0.9,"t2_price":1369.3,"t3_name":"ТехноСклад","t3_rev":75293.5,"t3_share":0.5,"t3_price":1530.4},{"brand":"DYNAMIX","our_rev":296236.8,"our_qty":615,"our_share":3.0,"our_price":1648,"comp_avg_price":1483.2,"price_rel":1.7,"market_rev":9874560.0,"t1_name":"ДетальМаркет","t1_rev":162930.2,"t1_share":1.2,"t1_price":1812.8,"t2_name":"ТехноСклад","t2_rev":103682.9,"t2_share":0.8,"t2_price":1400.8,"t3_name":"АвтоОпт","t3_rev":65172.1,"t3_share":0.4,"t3_price":1565.6},{"brand":"VOLTRON","our_rev":266283.5,"our_qty":165,"our_share":2.7,"our_price":1685,"comp_avg_price":1516.5,"price_rel":1.1,"market_rev":9862351.9,"t1_name":"ТехноСклад","t1_rev":146455.9,"t1_share":1.1,"t1_price":1853.5,"t2_name":"АвтоОпт","t2_rev":93199.2,"t2_share":0.7,"t2_price":1432.2,"t3_name":"ПрофиПартс","t3_rev":58582.4,"t3_share":0.4,"t3_price":1600.8},{"brand":"PRIMEAUTO","our_rev":136574.8,"our_qty":36,"our_share":1.4,"our_price":1722,"comp_avg_price":1549.8,"price_rel":1.25,"market_rev":9755342.9,"t1_name":"АвтоОпт","t1_rev":75116.1,"t1_share":0.6,"t1_price":1894.2,"t2_name":"ПрофиПартс","t2_rev":47801.2,"t2_share":0.3,"t2_price":1463.7,"t3_name":"РейтингАвто","t3_rev":30046.5,"t3_share":0.2,"t3_price":1635.9},{"brand":"OPTIMA","our_rev":135543.9,"our_qty":39,"our_share":1.4,"our_price":1759,"comp_avg_price":1583.1,"price_rel":1.4,"market_rev":9681707.1,"t1_name":"ПрофиПартс","t1_rev":74549.1,"t1_share":0.6,"t1_price":1934.9,"t2_name":"РейтингАвто","t2_rev":47440.4,"t2_share":0.3,"t2_price":1495.1,"t3_name":"Скорость+","t3_rev":29819.7,"t3_share":0.2,"t3_price":1671.0},{"brand":"PROTECTA","our_rev":132951.5,"our_qty":51,"our_share":1.4,"our_price":1796,"comp_avg_price":1616.4,"price_rel":1.55,"market_rev":9496535.7,"t1_name":"РейтингАвто","t1_rev":73123.3,"t1_share":0.6,"t1_price":1975.6,"t2_name":"Скорость+","t2_rev":46533.0,"t2_share":0.3,"t2_price":1526.6,"t3_name":"МегаДеталь","t3_rev":29249.3,"t3_share":0.2,"t3_price":1706.2},{"brand":"TITAN","our_rev":121919.5,"our_qty":65,"our_share":1.3,"our_price":1833,"comp_avg_price":1649.7,"price_rel":1.7,"market_rev":9378423.1,"t1_name":"Скорость+","t1_rev":67055.7,"t1_share":0.5,"t1_price":2016.3,"t2_name":"МегаДеталь","t2_rev":42671.8,"t2_share":0.3,"t2_price":1558.0,"t3_name":"ОригиналПро","t3_rev":26822.3,"t3_share":0.2,"t3_price":1741.3},{"brand":"SPEEDFIX","our_rev":118871.1,"our_qty":101,"our_share":1.2,"our_price":1870,"comp_avg_price":1683.0,"price_rel":1.1,"market_rev":9905925.0,"t1_name":"МегаДеталь","t1_rev":65379.1,"t1_share":0.5,"t1_price":2057.0,"t2_name":"ОригиналПро","t2_rev":41604.9,"t2_share":0.3,"t2_price":1589.5,"t3_name":"ЗапчастьХаб","t3_rev":26151.6,"t3_share":0.2,"t3_price":1776.5},{"brand":"FORCEPRO","our_rev":79574.6,"our_qty":10,"our_share":0.8,"our_price":1907,"comp_avg_price":1716.3,"price_rel":1.25,"market_rev":7957460.0,"t1_name":"ОригиналПро","t1_rev":43766.0,"t1_share":0.3,"t1_price":2097.7,"t2_name":"ЗапчастьХаб","t2_rev":27851.1,"t2_share":0.2,"t2_price":1621.0,"t3_name":"ДрайвСток","t3_rev":17506.4,"t3_share":0.1,"t3_price":1811.6},{"brand":"AUTOLUX","our_rev":44047.3,"our_qty":56,"our_share":0.5,"our_price":1944,"comp_avg_price":1749.6,"price_rel":1.4,"market_rev":4404730.0,"t1_name":"ЗапчастьХаб","t1_rev":24226.0,"t1_share":0.2,"t1_price":2138.4,"t2_name":"ДрайвСток","t2_rev":15416.6,"t2_share":0.1,"t2_price":1652.4,"t3_name":"УльтраАвто","t3_rev":9690.4,"t3_share":0.1,"t3_price":1846.8},{"brand":"EUROPART","our_rev":43367.4,"our_qty":7,"our_share":0.4,"our_price":1981,"comp_avg_price":1782.9,"price_rel":1.55,"market_rev":4336740.0,"t1_name":"ДрайвСток","t1_rev":23852.1,"t1_share":0.2,"t1_price":2179.1,"t2_name":"УльтраАвто","t2_rev":15178.6,"t2_share":0.1,"t2_price":1683.8,"t3_name":"АвтоМарт","t3_rev":9540.8,"t3_share":0.1,"t3_price":1881.9},{"brand":"RALLYX","our_rev":41479.5,"our_qty":74,"our_share":0.4,"our_price":2018,"comp_avg_price":1816.2,"price_rel":1.7,"market_rev":4147950.0,"t1_name":"УльтраАвто","t1_rev":22813.7,"t1_share":0.2,"t1_price":2219.8,"t2_name":"АвтоМарт","t2_rev":14517.8,"t2_share":0.1,"t2_price":1715.3,"t3_name":"ПартПро","t3_rev":9125.5,"t3_share":0.1,"t3_price":1917.1}],"stats":{"n_brands":44,"hold":44,"lower":0,"raise":0,"promo":0,"grow":44,"fall":0}};
+
+function fmt(n){const x=Math.abs(n);const s=n<0?'−':'';if(x>=1e6)return s+(x/1e6).toFixed(1)+' млн';if(x>=1e3)return s+Math.round(x/1e3)+' тыс';return s+Math.round(x)}
+function recTag(t, text){
+  const map={hold:'tag-hold',lower:'tag-lower',raise:'tag-raise',promo:'tag-promo',other:'tag-other'};
+  return '<span class="tag '+(map[t]||'tag-other')+'">'+(text||t)+'</span>';
+}
+function shortRec(r){
+  if(!r) return '—';
+  if(r.length>55) return r.slice(0,55)+'…';
+  return r;
+}
+
+document.getElementById('k-n').textContent = DATA.stats.n_brands;
+document.getElementById('k-hold').textContent = DATA.stats.hold;
+document.getElementById('k-lower').textContent = DATA.stats.lower;
+document.getElementById('k-raise').textContent = DATA.stats.raise;
+document.getElementById('k-promo').textContent = DATA.stats.promo;
+
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+new Chart(document.getElementById('cRec'),{
+  type:'doughnut',
+  data:{labels:['Удерживать','Снижать','Повышать','Продвижение'],
+    datasets:[{data:[DATA.stats.hold,DATA.stats.lower,DATA.stats.raise,DATA.stats.promo],
+      backgroundColor:['#22c55e','#ef4444','#3b82f6','#f97316']}]},
+  options:{plugins:{legend:{position:'bottom',labels:{color:'#8b9bb4'}}},maintainAspectRatio:false}
+});
+new Chart(document.getElementById('cTrend'),{
+  type:'doughnut',
+  data:{labels:['Рост','Падение'],datasets:[{data:[DATA.stats.grow,DATA.stats.fall],backgroundColor:['#22c55e','#ef4444']}]},
+  options:{plugins:{legend:{position:'bottom',labels:{color:'#8b9bb4'}}},maintainAspectRatio:false}
+});
+const topB = [...DATA.brands].sort((a,b)=>b.w4_rev-a.w4_rev).slice(0,8);
+new Chart(document.getElementById('cTop'),{
+  type:'bar',
+  data:{labels:topB.map(b=>b.brand),datasets:[{label:'Выручка',data:topB.map(b=>b.w4_rev),backgroundColor:'#3b82f6'}]},
+  options:{plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#8b9bb4',maxRotation:45},grid:{color:'#2d3a4f'}},
+            y:{ticks:{color:'#8b9bb4'},grid:{color:'#2d3a4f'}}},maintainAspectRatio:false}
+});
+
+function renderBrands(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const fr=document.getElementById('fRec').value;
+  const tb=document.getElementById('brandBody'); tb.innerHTML='';
+  let n=0;
+  [...DATA.brands].sort((a,b)=>b.w4_rev-a.w4_rev).forEach(b=>{
+    if(fr && b.rec_type!==fr) return;
+    if(q && !b.brand.toLowerCase().includes(q)) return;
+    n++;
+    const tr=document.createElement('tr');
+    const dCls=b.d_rev_pct>=0?'pos':'neg';
+    const sCls=b.d_share_pp>=0?'pos':'neg';
+    tr.innerHTML=`
+      <td><strong>${b.brand}</strong></td>
+      <td class="money">${fmt(b.w4_rev)}</td>
+      <td class="money">${b.w4_qty}</td>
+      <td class="money">${b.w4_price.toLocaleString('ru')}</td>
+      <td>${b.w4_share}%</td>
+      <td>${b.w4_price_rel}</td>
+      <td class="${dCls}">${b.d_rev_pct}%</td>
+      <td class="${sCls}">${b.d_share_pp}</td>
+      <td>${b.trend_rev||'—'}</td>
+      <td>${recTag(b.rec_type, shortRec(b.recommend))}</td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent='Показано: '+n;
+}
+document.getElementById('search').addEventListener('input',renderBrands);
+document.getElementById('fRec').addEventListener('change',renderBrands);
+renderBrands();
+
+// Tops / summary cards
+const grid=document.getElementById('compGrid');
+DATA.summary.forEach(s=>{
+  const div=document.createElement('div');
+  div.className='comp-card';
+  const pr=s.price_rel;
+  const prTxt = pr>1.05 ? ('дороже рынка ×'+pr) : pr<0.95 ? ('дешевле рынка ×'+pr) : ('около рынка ×'+pr);
+  div.innerHTML=`
+    <h4>${s.brand} · доля ${s.our_share}% · ${prTxt}</h4>
+    <div class="comp-row"><span class="muted">Автолига</span><span class="money">${fmt(s.our_rev)} ₽ · цена ${s.our_price.toLocaleString('ru')}</span></div>
+    <div class="comp-row"><span>1. ${s.t1_name}</span><span class="money">${fmt(s.t1_rev)} · ${s.t1_share}% · ${s.t1_price.toLocaleString('ru')} ₽</span></div>
+    <div class="comp-row"><span>2. ${s.t2_name||'—'}</span><span class="money">${s.t2_name?fmt(s.t2_rev)+' · '+s.t2_share+'% · '+s.t2_price.toLocaleString('ru')+' ₽':'—'}</span></div>
+    <div class="comp-row"><span>3. ${s.t3_name||'—'}</span><span class="money">${s.t3_name?fmt(s.t3_rev)+' · '+s.t3_share+'% · '+s.t3_price.toLocaleString('ru')+' ₽':'—'}</span></div>`;
+  grid.appendChild(div);
+});
+
+function fillList(id, type, limit=8){
+  const box=document.getElementById(id);
+  const items=[...DATA.brands].filter(b=>b.rec_type===type).sort((a,b)=>b.w4_rev-a.w4_rev).slice(0,limit);
+  if(!items.length){box.innerHTML='<div class="muted">Нет брендов в этой группе</div>';return}
+  items.forEach((b,i)=>{
+    const div=document.createElement('div');
+    div.className='prio-item';
+    div.innerHTML=`
+      <div class="num">${i+1}</div>
+      <div>
+        <div style="font-weight:600">${b.brand}</div>
+        <div class="muted" style="font-size:.8rem;margin-top:2px">${shortRec(b.recommend)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="money">${fmt(b.w4_rev)}</div>
+        <div class="muted" style="font-size:.8rem;margin-top:2px">доля ${b.w4_share}% · ×${b.w4_price_rel}</div>
+      </div>`;
+    box.appendChild(div);
+  });
+}
+fillList('listLower','lower');
+fillList('listPromo','promo');
+fillList('listRaise','raise');
+fillList('listHold','hold',6);
+</script>
+</body>
+</html>
