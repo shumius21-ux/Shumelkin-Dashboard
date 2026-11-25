@@ -1,304 +1,1389 @@
 <!DOCTYPE html>
+<!-- ============================================================
+  АНАЛИЗ КОНКУРЕНТОВ · Ozon · демо-дашборд (NEON · RED)
+  Шумелкин Е.А. · портфолио · данные вымышленные
+  Сверено с главной, воронкой и юнит-экономикой:
+  наша выручка 9 699 983 ₽ · 3 100 шт · доля 32% · индекс цен 0,94
+  рынок 30,3 млн ₽ · топ-3 конкурента 58% · 12 брендов
+============================================================ -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Анализ конкурентов — демо для портфолио</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>Анализ конкурентов Ozon — демо · Шумелкин Е.А.</title>
+<meta name="description" content="Интерактивный демо-дашборд: доля рынка по 12 брендам, индекс цен к конкурентам, недельная динамика, топ-3 соперника и автовердикты по цене и продвижению. Данные вымышленные, логика рабочая.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23FB923C'/%3E%3Cstop offset='.5' stop-color='%23FB4D5C'/%3E%3Cstop offset='1' stop-color='%23F0509E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230B0406'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='5' fill='url(%23g)'/%3E%3Cpath d='M32 8v8M32 48v8M8 32h8M48 32h8' stroke='url(%23g)' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0f1419; --panel:#1a2332; --panel2:#243044; --border:#2d3a4f;
-    --text:#e7ecf3; --muted:#8b9bb4; --accent:#3b82f6;
-    --green:#22c55e; --yellow:#eab308; --orange:#f97316; --red:#ef4444; --cyan:#06b6d4;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  .header{background:linear-gradient(135deg,#1a2332,#0f172a);border-bottom:1px solid var(--border);
-    padding:16px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-  .header h1{font-size:1.25rem;font-weight:650}
-  .header .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
-  .badge{background:var(--panel2);border:1px solid var(--border);color:var(--cyan);padding:8px 16px;border-radius:8px;font-size:1.05rem;font-weight:650}
-  .tabs{display:flex;gap:4px;padding:12px 24px 0;border-bottom:1px solid var(--border);overflow-x:auto}
-  .tab{background:transparent;border:none;color:var(--muted);padding:10px 18px;cursor:pointer;font-size:.9rem;border-radius:8px 8px 0 0;white-space:nowrap}
-  .tab:hover{color:var(--text);background:var(--panel)}
-  .tab.active{color:var(--text);background:var(--panel);border:1px solid var(--border);border-bottom-color:var(--panel);margin-bottom:-1px}
-  .panel{display:none;padding:20px 24px 40px;animation:fade .2s ease}
-  .panel.active{display:block}
-  @keyframes fade{from{opacity:0}to{opacity:1}}
-  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-  .kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
-  .kpi .label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
-  .kpi .value{font-size:1.35rem;font-weight:700;margin-top:6px}
-  .kpi .hint{color:var(--muted);font-size:.78rem;margin-top:4px}
-  .kpi.accent .value{color:var(--accent)} .kpi.green .value{color:var(--green)}
-  .kpi.orange .value{color:var(--orange)} .kpi.red .value{color:var(--red)} .kpi.cyan .value{color:var(--cyan)}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-  @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
-  .card h3{font-size:.95rem;margin-bottom:12px;font-weight:600}
-  .chart-wrap{position:relative;height:260px}
-  .insights{display:grid;gap:10px}
-  .insight{background:var(--panel2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;font-size:.9rem}
-  .insight.warn{border-left-color:var(--orange)} .insight.ok{border-left-color:var(--green)} .insight.danger{border-left-color:var(--red)}
-  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center}
-  .toolbar input,.toolbar select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem}
-  .table-wrap{overflow:auto;max-height:70vh;border:1px solid var(--border);border-radius:12px}
-  table{width:100%;border-collapse:collapse;font-size:.8rem}
-  th{position:sticky;top:0;background:var(--panel2);text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);white-space:nowrap;z-index:1}
-  td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
-  tr:hover td{background:rgba(59,130,246,.06)}
-  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600}
-  .tag-hold{background:#14532d;color:#86efac} .tag-lower{background:#450a0a;color:#fca5a5}
-  .tag-raise{background:#1e3a5f;color:#93c5fd} .tag-promo{background:#431407;color:#fdba74} .tag-other{background:#27272a;color:#a1a1aa}
-  .tag-up{background:#14532d;color:#86efac} .tag-down{background:#450a0a;color:#fca5a5}
-  .money{font-variant-numeric:tabular-nums} .muted{color:var(--muted)}
-  .pos{color:#86efac} .neg{color:#fca5a5}
-  .prio-list{display:grid;gap:8px}
-  .prio-item{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;
-    background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-  .prio-item .num{width:32px;height:32px;background:var(--panel2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
-  .comp-grid{display:grid;gap:12px}
-  .comp-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
-  .comp-card h4{font-size:.95rem;margin-bottom:8px}
-  .comp-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem}
-  .comp-row:last-child{border-bottom:none}
+/* ================= ПАЛИТРА · RED ================= */
+:root{
+  --bg:#0B0406; --bg2:#140709;
+  --surface:#1C0A0E; --surface2:#261015;
+  --line:#3A161C; --line2:#54212A;
+  --text:#FBEBEC; --muted:#C79BA1; --dim:#8E6169;
+  --red:#FB4D5C; --crimson:#E11D48; --coral:#FF7A6B; --rose:#FF4D8D; --scarlet:#FF2D46;
+  --amber:#FBBF24; --orange:#FB923C; --magenta:#F0509E; --violet:#8B5CF6;
+  --cyan:#22D3EE; --blue:#3E8BFF; --green:#34D399; --lime:#A3E635; --teal:#2DD4BF;
+  --slate:#8E6169;
+  --disp:'Unbounded','Inter',-apple-system,'Segoe UI',sans-serif;
+  --sans:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:'JetBrains Mono',Consolas,'Courier New',monospace;
+  --head-h:102px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scrollbar-color:var(--red) var(--bg);scrollbar-width:thin}
+body{background:var(--bg);color:var(--text);font:400 15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--orange),var(--red),var(--crimson));border-radius:8px;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--coral),var(--scarlet),var(--magenta))}
+::selection{background:rgba(251,77,92,.34)}
+a{color:var(--coral);text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono)}
+noscript .ns{display:block;background:rgba(251,191,36,.12);border-bottom:1px solid rgba(251,191,36,.4);color:var(--amber);text-align:center;padding:10px;font-size:13px}
+
+/* ================= ЖИВОЙ ФОН ================= */
+.aurora{position:fixed;inset:-10% 0 0 0;z-index:-3;overflow:hidden;pointer-events:none;will-change:transform}
+.blob{position:absolute;border-radius:50%;filter:blur(74px);opacity:.5;will-change:transform}
+.b1{width:580px;height:580px;left:-160px;top:-140px;background:radial-gradient(circle,rgba(251,77,92,.48),transparent 65%);animation:drift1 30s ease-in-out infinite alternate}
+.b2{width:520px;height:520px;right:-170px;top:4%;background:radial-gradient(circle,rgba(225,29,72,.42),transparent 65%);animation:drift2 36s ease-in-out infinite alternate}
+.b3{width:470px;height:470px;left:18%;top:58%;background:radial-gradient(circle,rgba(251,146,60,.26),transparent 65%);animation:drift3 42s ease-in-out infinite alternate}
+.b4{width:390px;height:390px;right:12%;top:76%;background:radial-gradient(circle,rgba(240,80,158,.28),transparent 65%);animation:drift1 34s ease-in-out infinite alternate-reverse}
+.b5{width:300px;height:300px;left:56%;top:20%;background:radial-gradient(circle,rgba(139,92,246,.16),transparent 65%);animation:drift2 40s ease-in-out infinite alternate-reverse}
+@keyframes drift1{from{transform:translate(0,0) scale(1)}to{transform:translate(90px,60px) scale(1.18)}}
+@keyframes drift2{from{transform:translate(0,0) scale(1.1)}to{transform:translate(-110px,80px) scale(.92)}}
+@keyframes drift3{from{transform:translate(0,0) scale(.95)}to{transform:translate(70px,-90px) scale(1.15)}}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(rgba(251,77,92,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(251,77,92,.05) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse 95% 75% at 50% 0%,#000 20%,transparent 80%);
+          mask-image:radial-gradient(ellipse 95% 75% at 50% 0%,#000 20%,transparent 80%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}
+
+/* ================= ШАПКА + ВКЛАДКИ ================= */
+header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(11,4,6,.87);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);transition:box-shadow .25s}
+header.scrolled{box-shadow:0 10px 34px rgba(0,0,0,.6),0 1px 0 rgba(251,77,92,.32)}
+.nav-in{height:56px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:11px;color:var(--text);min-width:0}
+.brand-mark{width:34px;height:34px;flex:none;border-radius:10px;background:linear-gradient(135deg,var(--orange),var(--red) 55%,var(--magenta));display:grid;place-items:center;color:#2A0508;box-shadow:0 0 18px rgba(251,77,92,.55)}
+.brand-mark svg{width:19px;height:19px}
+.brand-name{font-size:14px;font-weight:700;line-height:1.2;white-space:nowrap}
+.brand-role{font-size:10.5px;color:var(--dim);letter-spacing:.4px;white-space:nowrap}
+.back-link{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid var(--line2);border-radius:10px;font-size:12.5px;font-weight:700;color:var(--muted);transition:.18s;white-space:nowrap}
+.back-link:hover{border-color:var(--red);color:var(--coral);box-shadow:0 0 16px rgba(251,77,92,.3)}
+.back-link svg{width:14px;height:14px}
+.badge-demo{font:600 10px var(--mono);letter-spacing:1.2px;color:var(--amber);border:1px solid rgba(251,191,36,.5);background:rgba(251,191,36,.08);padding:4px 9px;border-radius:6px;flex:none;box-shadow:0 0 14px rgba(251,191,36,.15)}
+.tabs-in{height:46px;display:flex;align-items:stretch;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs-in::-webkit-scrollbar{display:none}
+.tab-btn{position:relative;padding:0 16px;font-size:13px;font-weight:700;color:var(--dim);white-space:nowrap;transition:color .18s,background .18s;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--muted);background:var(--bg2)}
+.tab-btn.active{color:var(--coral)}
+.tab-btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(251,77,92,.65)}
+.tab-btn.active::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;background:linear-gradient(90deg,var(--orange),var(--red),var(--magenta));box-shadow:0 0 10px rgba(251,77,92,.85)}
+.tab-btn .cnt{font:600 10px var(--mono);color:var(--dim);margin-left:6px}
+.tab-btn.active .cnt{color:var(--red)}
+
+/* ================= ДЕМО-ПЛАШКА + ТИКЕР ================= */
+.demo-strip{margin-top:var(--head-h);background:rgba(251,191,36,.09);border-bottom:1px solid rgba(251,191,36,.35);color:var(--amber);font:600 11px var(--mono);letter-spacing:1.1px;text-align:center;padding:8px 16px}
+.ticker{border-bottom:1px solid var(--line);background:rgba(20,7,9,.78);overflow:hidden;position:relative}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:70px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.ticker::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.ticker-track{display:flex;width:max-content;animation:tick 36s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes tick{to{transform:translateX(-50%)}}
+.tk-group{display:flex}
+.tk{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;font:600 11.5px var(--mono);letter-spacing:1px;color:var(--muted);white-space:nowrap}
+.tk b{color:var(--coral)} .tk .up{color:var(--green)} .tk .dn{color:var(--red)} .tk .wr{color:var(--amber)}
+.tk .sep{color:var(--magenta);text-shadow:0 0 8px rgba(240,80,158,.6)}
+
+/* ================= СЕКЦИИ ================= */
+main{position:relative}
+.panel-tab{padding:56px 0 80px;position:relative}
+.panel-tab[hidden]{display:none}
+.panel-tab::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(640px 320px at 88% 0%,rgba(251,77,92,.09),transparent 65%)}
+.sec-head{margin-bottom:30px;max-width:830px;position:relative}
+.eyebrow{font:600 11px var(--mono);letter-spacing:1.8px;color:var(--red);text-transform:uppercase;margin-bottom:12px}
+h1{font:800 clamp(26px,3.6vw,40px)/1.15 var(--disp);letter-spacing:-.5px;margin:10px 0 10px;
+  background:linear-gradient(92deg,#FF9A8B 0%,var(--red) 34%,var(--magenta) 66%,var(--amber) 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hue 9s ease-in-out infinite alternate}
+@keyframes hue{from{background-position:0% 0}to{background-position:100% 0}}
+h2{font:700 clamp(19px,2.4vw,26px)/1.3 var(--disp);letter-spacing:-.2px}
+.sec-sub{margin-top:10px;color:var(--muted);font-size:14px}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:rgba(28,10,14,.9);border:1px solid var(--line2);border-radius:14px;padding:14px 15px;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;top:0;left:14px;right:14px;height:1px;background:linear-gradient(90deg,transparent,var(--kc,var(--red)),transparent);opacity:.75}
+.kpi:hover{border-color:var(--kc,var(--red));transform:translateY(-3px);box-shadow:0 0 22px var(--kg,rgba(251,77,92,.18))}
+.kpi-l{font-size:10.5px;color:var(--dim);letter-spacing:.4px;text-transform:uppercase}
+.kpi-v{font-size:22px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-.3px;color:var(--kc,var(--text));text-shadow:0 0 18px var(--kg,transparent)}
+.kpi-s{font-size:10.5px;color:var(--dim);margin-top:2px}
+.rec-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.rs{display:flex;align-items:center;gap:12px;background:rgba(20,7,9,.75);border:1px solid var(--line);border-left:3px solid var(--rc);border-radius:12px;padding:13px 15px;transition:transform .2s,box-shadow .2s}
+.rs:hover{transform:translateY(-2px);box-shadow:0 0 20px var(--rg)}
+.rs-n{font:800 24px var(--sans);font-variant-numeric:tabular-nums;color:var(--rc);text-shadow:0 0 16px var(--rg)}
+.rs-t{font-size:12.5px;font-weight:700;line-height:1.3}
+.rs-s{font-size:10.5px;color:var(--dim);margin-top:2px}
+
+/* графики */
+.charts{display:grid;grid-template-columns:1fr 1.1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:rgba(28,10,14,.88);border:1px solid var(--line2);border-radius:16px;padding:20px;position:relative;overflow:hidden}
+.chart-card::before{content:"";position:absolute;top:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,var(--red),var(--magenta),transparent);opacity:.65}
+.chart-t{font:600 11px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.chart-note{font-size:11px;color:var(--dim);margin-top:10px}
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donut-legend{flex:1;min-width:200px}
+.dl-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.dl-row:last-child{border-bottom:none}
+.dl-row i{width:10px;height:10px;border-radius:3px;flex:none;box-shadow:0 0 8px currentColor}
+.dl-row b{font-weight:700}
+.dl-row .dl-m{margin-left:auto;font:600 12px var(--mono)}
+svg text{font-family:var(--mono)}
+.br-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.br-label{width:96px;flex:none;font-size:11.5px;color:var(--muted);text-align:right}
+.br-track{flex:1;height:12px;background:var(--bg2);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.br-fill{display:block;height:100%;transition:width .6s ease;box-shadow:0 0 8px currentColor}
+.br-val{width:132px;flex:none;text-align:right;font:500 11px var(--mono);color:var(--dim)}
+.br-val b{color:var(--text);font-weight:600}
+/* индекс цен: шкала вокруг 1.00 */
+.gauge-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+.gauge-label{width:96px;flex:none;font-size:11.5px;color:var(--muted);text-align:right}
+.gauge{flex:1;position:relative;height:16px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.gauge-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--dim);opacity:.7}
+.gauge-fill{position:absolute;top:3px;bottom:3px;border-radius:4px;transition:all .5s ease}
+.gauge-val{width:74px;flex:none;text-align:right;font:600 11.5px var(--mono)}
+.gauge-head{display:flex;gap:10px;font:500 10px var(--mono);color:var(--dim);margin-bottom:6px}
+.gauge-head .gauge-label{text-align:right}
+.gauge-head .gauge{background:none;border:none;height:auto;display:flex;justify-content:space-between;padding:0 2px}
+/* stacked доли */
+.st-row{display:flex;align-items:center;gap:10px;margin:9px 0}
+.st-label{width:96px;flex:none;font-size:11.5px;color:var(--muted);text-align:right}
+.st-bar{flex:1;display:flex;height:16px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--bg2)}
+.st-seg{height:100%;transition:width .6s ease}
+.st-val{width:96px;flex:none;text-align:right;font:600 11px var(--mono);color:var(--coral)}
+.legend-inline{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted)}
+.legend-inline span{display:inline-flex;align-items:center;gap:6px}
+.legend-inline i{width:9px;height:9px;border-radius:3px;box-shadow:0 0 7px currentColor}
+
+/* выводы */
+.insights{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0}
+.ins{display:flex;gap:13px;background:rgba(20,7,9,.75);border:1px solid var(--line);border-radius:14px;padding:16px;transition:border-color .2s,transform .2s}
+.ins:hover{border-color:var(--line2);transform:translateY(-2px)}
+.ins-ico{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;border:1px solid var(--ic,var(--red));background:var(--ig,rgba(251,77,92,.09));color:var(--ic,var(--red));box-shadow:0 0 14px var(--ig,rgba(251,77,92,.16))}
+.ins-ico svg{width:17px;height:17px}
+.ins h4{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.ins p{font-size:12.5px;color:var(--muted);line-height:1.6}
+.ins p b{color:var(--text)}
+
+/* контур */
+.loop{display:flex;align-items:stretch;margin-top:26px}
+.loop-node{flex:1;display:block;background:rgba(28,10,14,.85);border:1px solid var(--line2);border-radius:13px;padding:13px 15px;color:var(--text);transition:border-color .18s,transform .15s,box-shadow .18s}
+a.loop-node:hover{border-color:var(--amber);transform:translateY(-2px);box-shadow:0 0 22px rgba(251,191,36,.2)}
+.loop-node.cur{border-color:rgba(251,77,92,.65);background:rgba(251,77,92,.09);box-shadow:0 0 22px rgba(251,77,92,.18)}
+.ln-step{font:600 10px var(--mono);letter-spacing:1px;color:var(--amber);margin-bottom:4px}
+.loop-node.cur .ln-step{color:var(--coral)}
+.ln-t{font-size:13.5px;font-weight:700}
+.ln-s{font-size:11.5px;color:var(--dim);margin-top:2px}
+.loop-arrow{width:30px;flex:none;display:grid;place-items:center;color:var(--red)}
+.loop-arrow svg{width:15px;height:15px;filter:drop-shadow(0 0 5px rgba(251,77,92,.65))}
+
+/* ================= ФИЛЬТРЫ ================= */
+.filters{background:rgba(28,10,14,.92);border:1px solid var(--line2);border-radius:16px;padding:16px 18px;margin-bottom:16px;position:relative}
+.filters::before{content:"";position:absolute;top:0;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,var(--magenta),var(--red),transparent);opacity:.65}
+.f-grid{display:grid;grid-template-columns:1.2fr 1.9fr 1fr 1fr 1fr .9fr .9fr auto;gap:10px;align-items:end}
+.f-item label{display:block;font:600 10px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.f-in{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px 11px;font-size:13px;color:var(--text);transition:border-color .15s,box-shadow .15s}
+.f-in:focus{border-color:var(--red);outline:none;box-shadow:0 0 12px rgba(251,77,92,.3)}
+select.f-in{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--red) 50%),linear-gradient(135deg,var(--red) 50%,transparent 50%);background-position:calc(100% - 16px) 55%,calc(100% - 11px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+select.f-in option{background:#1C0A0E;color:#FBEBEC}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;padding:8px 6px;font-size:11px;font-weight:700;border:1px solid var(--line2);border-radius:8px;background:var(--bg2);color:var(--dim);transition:.15s;white-space:nowrap}
+.seg button:hover{color:var(--muted)}
+.seg button.on{border-color:var(--red);color:var(--coral);background:rgba(251,77,92,.11);box-shadow:0 0 12px rgba(251,77,92,.22)}
+.switch-row{display:flex;align-items:center;gap:9px;padding-bottom:2px}
+.switch-row span.lb{font-size:11px;color:var(--muted);line-height:1.25}
+.switch{position:relative;width:38px;height:21px;flex:none}
+.switch input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;z-index:1}
+.sl{position:absolute;inset:0;background:var(--line2);border-radius:999px;transition:.2s}
+.sl::before{content:"";position:absolute;left:3px;top:3.5px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:.2s}
+.switch input:checked + .sl{background:linear-gradient(90deg,var(--orange),var(--red));box-shadow:0 0 12px rgba(251,77,92,.45)}
+.switch input:checked + .sl::before{transform:translateX(17px);background:#fff}
+.f-reset{padding:9px 14px;border:1px solid var(--line2);border-radius:9px;background:var(--bg2);font-size:12.5px;font-weight:700;color:var(--muted);transition:.15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.f-reset:hover{border-color:var(--amber);color:var(--amber);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.f-reset svg{width:13px;height:13px}
+.f-summary{margin-top:12px;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px}
+.f-summary b{color:var(--coral);font-weight:700;font-variant-numeric:tabular-nums}
+.f-summary .up b{color:var(--green)} .f-summary .dn b{color:var(--red)}
+
+/* ================= ТАБЛИЦЫ ================= */
+.tbl-wrap{background:rgba(28,10,14,.88);border:1px solid var(--line2);border-radius:16px;overflow:auto;max-height:660px;position:relative}
+.tbl-wrap::-webkit-scrollbar{width:9px;height:9px}
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1120px}
+.dt thead th{position:sticky;top:0;z-index:3;background:var(--surface2);color:var(--dim);font:600 10.5px var(--mono);letter-spacing:.6px;text-transform:uppercase;text-align:right;padding:11px 12px;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+.dt thead th:hover{color:var(--coral)}
+.dt thead th.l{text-align:left}
+.dt thead th .arr{color:var(--red);margin-left:4px}
+.dt tbody td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dt tbody td.l{text-align:left;white-space:normal}
+.dt tbody tr{cursor:pointer;transition:background .12s}
+.dt tbody tr:hover{background:rgba(251,77,92,.07)}
+.dt tbody tr:last-child td{border-bottom:none}
+.dt .nm{font-weight:700;color:var(--text)}
+.dt .cd{font:400 10px var(--mono);color:var(--dim)}
+.dt .pos{color:var(--green);font-weight:700}
+.dt .neg{color:var(--red);font-weight:700}
+.dt .warn{color:var(--amber);font-weight:700}
+.dt .mut{color:var(--dim)}
+.dt td.empty{text-align:center;color:var(--dim);padding:28px;font-size:13px;cursor:default}
+.dt tr.total td{background:var(--bg2);font-weight:800;border-top:1px solid var(--line2)}
+.v-chip{display:inline-block;font:600 10.5px var(--mono);padding:3px 9px;border-radius:6px;border:1px solid;white-space:nowrap}
+.v-hold{color:var(--green);border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.08)}
+.v-lower{color:var(--amber);border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.09)}
+.v-raise{color:var(--cyan);border-color:rgba(34,211,238,.45);background:rgba(34,211,238,.08)}
+.v-promo{color:var(--magenta);border-color:rgba(240,80,158,.5);background:rgba(240,80,158,.09)}
+.trend{display:inline-flex;align-items:center;gap:5px;font:600 11px var(--mono)}
+.trend svg{width:12px;height:12px}
+.t-up{color:var(--green)} .t-down{color:var(--red)} .t-flat{color:var(--dim)}
+.pager{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.pg-btn{padding:8px 16px;border:1px solid var(--line2);border-radius:9px;background:var(--bg2);font-size:12.5px;font-weight:700;color:var(--muted);transition:.15s;display:inline-flex;align-items:center;gap:7px}
+.pg-btn:hover{border-color:var(--red);color:var(--coral);box-shadow:0 0 14px rgba(251,77,92,.22)}
+.pg-btn svg{width:13px;height:13px}
+.pg-csv{margin-left:auto}
+.tbl-hint{font-size:11.5px;color:var(--dim);margin-top:10px}
+.tbl-hint b{color:var(--coral)}
+
+/* карточки брендов · топ-3 */
+.bcards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.bc{background:rgba(28,10,14,.88);border:1px solid var(--line2);border-radius:15px;padding:17px;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:pointer}
+.bc:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 0 26px rgba(251,77,92,.18)}
+.bc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.bc-name{font:700 14px var(--disp)}
+.bc-share{font:800 18px var(--sans);color:var(--coral);font-variant-numeric:tabular-nums;text-shadow:0 0 16px rgba(251,77,92,.4)}
+.bc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--bg2);margin-bottom:11px}
+.bc-bar div{height:100%}
+.bc-row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.bc-row:last-child{border-bottom:none}
+.bc-row i{width:8px;height:8px;border-radius:2px;flex:none}
+.bc-row .n{color:var(--muted)}
+.bc-row .s{margin-left:auto;font:600 11px var(--mono);color:var(--text)}
+.bc-row .p{width:76px;text-align:right;font:400 10.5px var(--mono);color:var(--dim)}
+.bc-foot{margin-top:11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* рекомендации */
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rc{background:rgba(28,10,14,.88);border:1px solid var(--line2);border-top:3px solid var(--rc);border-radius:16px;padding:20px}
+.rc-head{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.rc-ico{width:36px;height:36px;flex:none;border-radius:10px;display:grid;place-items:center;color:var(--rc);border:1px solid var(--rc);background:var(--rg);box-shadow:0 0 16px var(--rg)}
+.rc-ico svg{width:18px;height:18px}
+.rc-t{font:700 15px var(--disp);color:var(--rc)}
+.rc-c{margin-left:auto;font:800 20px var(--sans);color:var(--rc);font-variant-numeric:tabular-nums}
+.rc-d{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.rc-list{list-style:none}
+.rc-list li{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;cursor:pointer;transition:color .15s}
+.rc-list li:hover{color:var(--coral)}
+.rc-list li:last-child{border-bottom:none}
+.rc-list .b{font-weight:700;min-width:92px}
+.rc-list .m{margin-left:auto;font:500 11px var(--mono);color:var(--dim);text-align:right}
+.rc-empty{font-size:12.5px;color:var(--dim);padding:10px 0}
+
+/* методика */
+.method{background:rgba(28,10,14,.88);border:1px solid var(--line2);border-radius:16px;padding:22px;margin-bottom:16px}
+.method h3{font:700 15px var(--disp);margin-bottom:12px;color:var(--coral)}
+.method ul{list-style:none}
+.method li{display:flex;gap:10px;font-size:13px;color:var(--muted);padding:7px 0;border-bottom:1px dashed var(--line)}
+.method li:last-child{border-bottom:none}
+.method li svg{width:15px;height:15px;flex:none;margin-top:3px;color:var(--red)}
+.method li b{color:var(--text)}
+.formula-box{font:500 12px var(--mono);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:12px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
+.formula-box .g{color:var(--green);font-weight:600}
+.formula-box .a{color:var(--amber)}
+.formula-box .r{color:var(--red);font-weight:600}
+.formula-box .c{color:var(--cyan)}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pr{display:flex;gap:13px;background:rgba(20,7,9,.7);border:1px solid var(--line);border-radius:14px;padding:16px}
+.pr-ico{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;border:1px solid rgba(251,146,60,.45);background:rgba(251,146,60,.08);color:var(--orange);box-shadow:0 0 14px rgba(251,146,60,.16)}
+.pr-ico svg{width:17px;height:17px}
+.pr h5{font-size:13.5px;font-weight:700;margin-bottom:3px}
+.pr p{font-size:12px;color:var(--muted);line-height:1.55}
+.logic{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+
+/* ================= МОДАЛ ================= */
+.modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-bg{position:absolute;inset:0;background:rgba(6,2,3,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal-panel{position:relative;width:min(780px,100%);max-height:88vh;overflow:auto;background:var(--surface);border:1px solid rgba(251,77,92,.5);border-radius:18px;padding:24px;box-shadow:0 0 60px rgba(251,77,92,.22),0 30px 80px rgba(0,0,0,.65)}
+.modal-panel::-webkit-scrollbar{width:8px}
+.m-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border:1px solid var(--line2);border-radius:9px;display:grid;place-items:center;color:var(--muted);transition:.15s}
+.m-close:hover{border-color:var(--red);color:var(--red)}
+.m-close svg{width:15px;height:15px}
+.m-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;padding-right:44px}
+.m-title{font:700 18px var(--disp)}
+.m-code{font:500 11px var(--mono);color:var(--dim)}
+.m-verdict{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border-radius:12px;border:1px solid var(--line);margin:14px 0}
+.m-verdict .vi{width:32px;height:32px;flex:none;border-radius:9px;display:grid;place-items:center}
+.m-verdict .vi svg{width:17px;height:17px}
+.m-verdict .vt{font-size:14px;font-weight:800}
+.m-verdict .vn{font-size:12px;color:var(--muted);margin-top:2px}
+.mv-hold{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.07)}
+.mv-hold .vi{color:var(--green);background:rgba(52,211,153,.14)} .mv-hold .vt{color:var(--green)}
+.mv-lower{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.07)}
+.mv-lower .vi{color:var(--amber);background:rgba(251,191,36,.14)} .mv-lower .vt{color:var(--amber)}
+.mv-raise{border-color:rgba(34,211,238,.5);background:rgba(34,211,238,.07)}
+.mv-raise .vi{color:var(--cyan);background:rgba(34,211,238,.14)} .mv-raise .vt{color:var(--cyan)}
+.mv-promo{border-color:rgba(240,80,158,.5);background:rgba(240,80,158,.07)}
+.mv-promo .vi{color:var(--magenta);background:rgba(240,80,158,.14)} .mv-promo .vt{color:var(--magenta)}
+.m-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.mk{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.mk-l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px}
+.mk-v{font-size:17px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+.mk-v.pos{color:var(--green)} .mk-v.neg{color:var(--red)} .mk-v.warn{color:var(--amber)} .mk-v.info{color:var(--coral)}
+.m-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.m-table th{text-align:right;font:600 10px var(--mono);color:var(--dim);text-transform:uppercase;padding:7px 6px;border-bottom:1px solid var(--line2)}
+.m-table th:first-child{text-align:left}
+.m-table td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.m-table td:first-child{text-align:left}
+.m-table tr:last-child td{border-bottom:none}
+.m-table tr.us td{background:rgba(251,77,92,.08);font-weight:700}
+.m-table .sw{display:inline-flex;align-items:center;gap:8px}
+.m-table .sw i{width:9px;height:9px;border-radius:3px;flex:none;box-shadow:0 0 6px currentColor}
+.m-formula{font:500 11.5px var(--mono);background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:12px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
+.m-formula .r{color:var(--red);font-weight:600}
+.m-formula .g{color:var(--green);font-weight:600}
+.m-params{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.mp{font:500 10.5px var(--mono);border:1px solid var(--line2);border-radius:6px;padding:4px 8px;color:var(--dim)}
+.mp b{color:var(--muted)}
+.m-actions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.act{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border:1px solid var(--line2);border-radius:10px;background:var(--bg2);font-size:12.5px;font-weight:700;color:var(--muted);transition:.15s}
+.act:hover{border-color:var(--red);color:var(--coral);transform:translateY(-1px);box-shadow:0 0 16px rgba(251,77,92,.22)}
+.act svg{width:14px;height:14px}
+
+/* footer / toast */
+footer{border-top:1px solid var(--line);padding:26px 0}
+.foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-size:12px;color:var(--dim)}
+.foot a{color:var(--muted)} .foot a:hover{color:var(--coral)}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,12px);z-index:400;background:var(--surface2);border:1px solid var(--red);border-radius:11px;padding:10px 18px;font-size:13px;font-weight:700;color:var(--text);opacity:0;pointer-events:none;transition:.25s;box-shadow:0 0 30px rgba(251,77,92,.32)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ================= АДАПТИВ ================= */
+@media (max-width:1120px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .f-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+  .charts{grid-template-columns:1fr}
+  .bcards{grid-template-columns:1fr 1fr}
+  .rec-strip{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .insights,.logic,.principles,.rec-grid{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .loop{overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+  .loop-node{min-width:180px;scroll-snap-align:start}
+  .m-kpis{grid-template-columns:1fr 1fr}
+  .brand-role{display:none}
+  .bcards{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .rec-strip{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr}
+  .wrap{padding:0 16px}
+  .back-link span{display:none}
+  .br-label,.gauge-label,.st-label{width:74px}
+  .br-val{width:104px}
+  .st-val{width:78px}
+  .pg-csv{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+  h1{background-position:0 0}
+}
 </style>
 </head>
 <body>
+<noscript><div class="ns">Дашборд интерактивный: для таблиц, фильтров и графиков нужен JavaScript.</div></noscript>
 
-  <div style="background:linear-gradient(90deg,#7c2d12,#9a3412);color:#fef3c7;padding:14px 24px;text-align:center;font-weight:700;font-size:1.05rem;letter-spacing:0.02em;border-bottom:2px solid #ea580c;">
-    ⚠ ДАННЫЕ ВЫМЫШЛЕННЫЕ · ДЕМОНСТРАЦИЯ ДЛЯ ПОРТФОЛИО · НЕ РЕАЛЬНЫЕ ПОКАЗАТЕЛИ
-  </div>
-
-<div class="header">
-  <div>
-    <h1>Анализ конкурентов · доля, цена, рекомендации</h1>
-    <div class="sub">Автолига · бренды · топ-3 конкурента · динамика и автоматические выводы</div>
-  </div>
-  <div class="badge">Портфолио — Шумелкин Е. А.</div>
+<div class="aurora" id="aurora" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div><div class="blob b5"></div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" data-tab="main">Обзор</button>
-  <button class="tab" data-tab="brands">Бренды и динамика</button>
-  <button class="tab" data-tab="tops">Топ-3 конкуренты</button>
-  <button class="tab" data-tab="actions">Рекомендации</button>
-  <button class="tab" data-tab="method">Методика</button>
+<!-- ================= ШАПКА ================= -->
+<header id="header">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1.5v3.5M12 19v3.5M1.5 12H5M19 12h3.5"/></svg></span>
+      <span><span class="brand-name">Анализ конкурентов · Ozon</span><br><span class="brand-role">Шумелкин Е.А. · демо-дашборд</span></span>
+    </a>
+    <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span>Портфолио</span></a>
+    <span class="badge-demo">ДЕМО</span>
+  </div>
+  <div class="wrap tabs-in" role="tablist" aria-label="Разделы дашборда">
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="0" type="button">Обзор рынка</button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="1" type="button">Бренды и динамика <span class="cnt">12</span></button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="2" type="button">Топ-3 конкурента</button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="3" type="button">Рекомендации <span class="cnt" id="cntRec">—</span></button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="4" type="button">Методика и связка</button>
+  </div>
+</header>
+
+<div class="demo-strip">⚠ ДАННЫЕ ВЫМЫШЛЕННЫЕ · ДЕМОНСТРАЦИЯ ДЛЯ ПОРТФОЛИО · НЕ РЕАЛЬНЫЕ ПОКАЗАТЕЛИ</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <div class="tk-group">
+      <span class="tk">НАША ДОЛЯ <b class="up">32,0%</b><span class="sep">◆</span></span>
+      <span class="tk">ИНДЕКС ЦЕН <b class="wr">0,94</b> · ДЕШЕВЛЕ РЫНКА НА 6%<span class="sep">◆</span></span>
+      <span class="tk">ТОП-3 ЗАБИРАЮТ <b class="dn">58%</b><span class="sep">◆</span></span>
+      <span class="tk">ВЫРУЧКА <b>9,7 МЛН ₽</b> <b class="up">+5,8%</b><span class="sep">◆</span></span>
+      <span class="tk">РЫНОК <b>30,3 МЛН ₽</b><span class="sep">◆</span></span>
+      <span class="tk">12 БРЕНДОВ · 3 100 ШТ<span class="sep">◆</span></span>
+      <span class="tk">ЦЕНА ВЫШЕ + ДОЛЯ ПАДАЕТ → <b class="wr">СНИЖАТЬ</b><span class="sep">◆</span></span>
+      <span class="tk">ЦЕНА НИЖЕ + ДОЛЯ РАСТЁТ → <b class="up">МОЖНО ПОВЫШАТЬ</b><span class="sep">◆</span></span>
+      <span class="tk">ДОЛЯ = НАША ВЫРУЧКА / ВЫРУЧКА РЫНКА<span class="sep">◆</span></span>
+    </div>
+    <div class="tk-group">
+      <span class="tk">НАША ДОЛЯ <b class="up">32,0%</b><span class="sep">◆</span></span>
+      <span class="tk">ИНДЕКС ЦЕН <b class="wr">0,94</b> · ДЕШЕВЛЕ РЫНКА НА 6%<span class="sep">◆</span></span>
+      <span class="tk">ТОП-3 ЗАБИРАЮТ <b class="dn">58%</b><span class="sep">◆</span></span>
+      <span class="tk">ВЫРУЧКА <b>9,7 МЛН ₽</b> <b class="up">+5,8%</b><span class="sep">◆</span></span>
+      <span class="tk">РЫНОК <b>30,3 МЛН ₽</b><span class="sep">◆</span></span>
+      <span class="tk">12 БРЕНДОВ · 3 100 ШТ<span class="sep">◆</span></span>
+      <span class="tk">ЦЕНА ВЫШЕ + ДОЛЯ ПАДАЕТ → <b class="wr">СНИЖАТЬ</b><span class="sep">◆</span></span>
+      <span class="tk">ЦЕНА НИЖЕ + ДОЛЯ РАСТЁТ → <b class="up">МОЖНО ПОВЫШАТЬ</b><span class="sep">◆</span></span>
+      <span class="tk">ДОЛЯ = НАША ВЫРУЧКА / ВЫРУЧКА РЫНКА<span class="sep">◆</span></span>
+    </div>
+  </div>
 </div>
 
-<div id="main" class="panel active">
-  <div class="kpi-row">
-    <div class="kpi accent"><div class="label">Брендов в срезе</div><div class="value" id="k-n">—</div><div class="hint">июльский контур</div></div>
-    <div class="kpi green"><div class="label">Удерживать цену</div><div class="value" id="k-hold">—</div><div class="hint">доля растёт / стабильна</div></div>
-    <div class="kpi red"><div class="label">Снижать цену</div><div class="value" id="k-lower">—</div><div class="hint">цена выше, доля падает</div></div>
-    <div class="kpi cyan"><div class="label">Можно повышать</div><div class="value" id="k-raise">—</div><div class="hint">цена ниже, доля растёт</div></div>
-    <div class="kpi orange"><div class="label">Усилить продвижение</div><div class="value" id="k-promo">—</div><div class="hint">доля падает при низкой цене</div></div>
-  </div>
-  <div class="grid-2">
-    <div class="card"><h3>Рекомендации по брендам</h3><div class="chart-wrap"><canvas id="cRec"></canvas></div></div>
-    <div class="card"><h3>Тренд выручки (2 недели)</h3><div class="chart-wrap"><canvas id="cTrend"></canvas></div></div>
-  </div>
-  <div class="grid-2">
-    <div class="card"><h3>Топ брендов по выручке (неделя)</h3><div class="chart-wrap"><canvas id="cTop"></canvas></div></div>
-    <div class="card">
-      <h3>Ключевые выводы</h3>
-      <div class="insights">
-        <div class="insight ok">Где цена выше рынка, но доля растёт — удерживать позиции, не демпинговать без нужды.</div>
-        <div class="insight danger">Где цена выше, а доля падает — приоритет на снижение цены или пересмотр ассортимента внутри бренда.</div>
-        <div class="insight warn">Где цена ниже, но доля всё равно падает — проблема не в цене: карточка, наличие, продвижение.</div>
-        <div class="insight">Система даёт не просто «кто конкурент», а действие: удерживать / снижать / повышать / усиливать продвижение.</div>
+<main>
+<!-- ================= ВКЛАДКА 0 · ОБЗОР ================= -->
+<section class="panel-tab" data-panel="0" role="tabpanel">
+  <div class="wrap">
+    <div class="sec-head rv in">
+      <div class="eyebrow">Отчёт 03 · рынок · Ozon</div>
+      <h1>Анализ конкурентов</h1>
+      <p class="sec-sub">Срез на 13.09.2026 · неделя 07–13.09 против 31.08–06.09 · 12 брендов автозапчастей. Доля рынка, индекс цен к конкурентам, недельная динамика и топ-3 соперника, которые забирают выручку. По каждому бренду — автоматический вердикт.</p>
+    </div>
+
+    <div class="kpi-grid rv in" id="kpiGrid"></div>
+    <div class="rec-strip rv in" id="recStrip"></div>
+
+    <div class="charts">
+      <div class="chart-card rv">
+        <div class="chart-t">Доля рынка · мы против конкурентов</div>
+        <div class="donut-wrap">
+          <div id="donut"></div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+        <div class="chart-note">Доля = наша выручка / выручка рынка по всем 12 брендам за неделю. Топ-3 — три крупнейших продавца-соперника в срезе.</div>
+      </div>
+      <div class="chart-card rv" style="transition-delay:.06s">
+        <div class="chart-t">Топ брендов по нашей выручке · ₽ за неделю</div>
+        <div id="topBrands"></div>
+        <div class="chart-note">Цвет столбца — автовердикт по бренду. Наведи на строку в таблице «Бренды и динамика», чтобы увидеть детали.</div>
       </div>
     </div>
-  </div>
-</div>
 
-<div id="brands" class="panel">
-  <div class="toolbar">
-    <input type="text" id="search" placeholder="Поиск бренда…">
-    <select id="fRec">
-      <option value="">Рекомендация: все</option>
-      <option value="hold">Удерживать</option>
-      <option value="lower">Снижать цену</option>
-      <option value="raise">Повышать цену</option>
-      <option value="promo">Усилить продвижение</option>
-    </select>
-    <span class="muted" id="rowCount"></span>
+    <div class="chart-card rv">
+      <div class="chart-t">Индекс цен · мы относительно конкурентов</div>
+      <div class="gauge-head"><span class="gauge-label">Бренд</span><span class="gauge"><span>← дешевле рынка</span><span>1,00 · паритет</span><span>дороже рынка →</span></span><span class="gauge-val"></span></div>
+      <div id="indexGauge"></div>
+      <div class="chart-note">Индекс = наша средняя цена / средневзвешенная цена топ-3 конкурента по бренду. Ниже 1,00 — мы дешевле. Общий индекс по срезу: <b style="color:var(--amber)">0,94</b>.</div>
+    </div>
+
+    <div class="insights">
+      <div class="ins rv" style="--ic:var(--green);--ig:rgba(52,211,153,.09)"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><div><h4>Цена выше — доля растёт</h4><p>Держим позиции и <b>не демпингуем без нужды</b>. Рынок принимает нашу цену: продукт, карточка и наличие работают лучше, чем скидка.</p></div></div>
+      <div class="ins rv" style="--ic:var(--amber);--ig:rgba(251,191,36,.09);transition-delay:.05s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span><div><h4>Цена выше — доля падает</h4><p>Приоритет на <b>снижение цены</b> или пересмотр ассортимента внутри бренда. Перед снижением — проверка маржи в юнит-экономике.</p></div></div>
+      <div class="ins rv" style="--ic:var(--magenta);--ig:rgba(240,80,158,.09);transition-delay:.1s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><div><h4>Цена ниже — доля всё равно падает</h4><p>Проблема <b>не в цене</b>: карточка, наличие, отзывы, продвижение. Скидка здесь только сожжёт маржу, не вернув долю.</p></div></div>
+      <div class="ins rv" style="--ic:var(--cyan);--ig:rgba(34,211,238,.09);transition-delay:.15s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span><div><h4>Цена ниже — доля растёт</h4><p>Есть окно <b>поднять цену</b> и забрать маржу обратно. Проверяем по шагам: +3–5% и смотрим, удержится ли доля следующую неделю.</p></div></div>
+    </div>
+
+    <div class="loop rv" aria-label="Контур отчётов">
+      <a class="loop-node" href="Воронка.html"><div class="ln-step">ШАГ 1 · СПРОС</div><div class="ln-t">Воронка</div><div class="ln-s">где ломается покупка</div></a>
+      <div class="loop-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <a class="loop-node" href="Юнит-экономика.html"><div class="ln-step">ШАГ 2 · МАРЖА</div><div class="ln-t">Юнит-экономика</div><div class="ln-s">можно ли зарабатывать</div></a>
+      <div class="loop-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="loop-node cur"><div class="ln-step">ШАГ 3 · РЫНОК · ВЫ ЗДЕСЬ</div><div class="ln-t">Конкуренты</div><div class="ln-s">где теряется доля</div></div>
+      <div class="loop-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="loop-node"><div class="ln-step">ИТОГ</div><div class="ln-t">Решение</div><div class="ln-s">цена · закуп · ассортимент</div></div>
+    </div>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Бренд</th><th>Выручка</th><th>Шт</th><th>Ср. цена</th><th>Доля %</th>
-          <th>Отнош. цен</th><th>Δ выр. %</th><th>Δ доли п.п.</th><th>Тренд</th><th>Рекомендация</th>
-        </tr>
-      </thead>
-      <tbody id="brandBody"></tbody>
+</section>
+
+<!-- ================= ВКЛАДКА 1 · БРЕНДЫ ================= -->
+<section class="panel-tab" data-panel="1" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="sec-head rv in">
+      <div class="eyebrow">Таблица · 12 брендов</div>
+      <h2>Бренды и динамика</h2>
+      <p class="sec-sub">Выручка, штуки, средняя цена, доля рынка, индекс цен и изменение за две недели. Клик по строке — разбор бренда: кто отбирает долю, по каким ценам и что делать.</p>
+    </div>
+
+    <div class="filters rv in" aria-label="Фильтры">
+      <div class="f-grid">
+        <div class="f-item"><label for="fQ">Поиск по бренду</label><input class="f-in" id="fQ" type="search" placeholder="например: BOSCH"></div>
+        <div class="f-item"><label>Рекомендация</label><div class="seg" id="fRec"><button type="button" data-v="" class="on">Все</button><button type="button" data-v="hold">Удерживать</button><button type="button" data-v="lower">Снижать</button><button type="button" data-v="raise">Повышать</button><button type="button" data-v="promo">Продвижение</button></div></div>
+        <div class="f-item"><label for="fTrend">Тренд выручки</label><select class="f-in" id="fTrend"><option value="">Любой</option><option value="up">Рост</option><option value="down">Падение</option></select></div>
+        <div class="f-item"><label for="fIdx">Индекс цен</label><select class="f-in" id="fIdx"><option value="">Любой</option><option value="below">Ниже рынка</option><option value="par">На уровне</option><option value="above">Выше рынка</option></select></div>
+        <div class="f-item"><label for="fSort">Сортировка</label><select class="f-in" id="fSort">
+          <option value="rev:-1">Выручка ↓</option><option value="share:-1">Доля ↓</option><option value="dShare:1">Δ доли ↑</option>
+          <option value="dShare:-1">Δ доли ↓</option><option value="idx:-1">Индекс цен ↓</option><option value="growth:-1">Δ выручки ↓</option><option value="market:-1">Объём рынка ↓</option>
+        </select></div>
+        <div class="f-item"><label>Доли в таблице</label><div class="switch-row"><span class="switch"><input type="checkbox" id="fMoney"><span class="sl"></span></span><span class="lb">показать<br>в ₽</span></div></div>
+        <div class="f-item"><label>Только риск</label><div class="switch-row"><span class="switch"><input type="checkbox" id="fRisk"><span class="sl"></span></span><span class="lb">доля<br>падает</span></div></div>
+        <div class="f-item"><label>&nbsp;</label><button class="f-reset" id="fReset" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Сброс</button></div>
+      </div>
+      <div class="f-summary" id="fSummary"></div>
+    </div>
+
+    <div class="chart-card rv" style="margin-bottom:16px">
+      <div class="chart-t">Тренд выручки · две недели по брендам</div>
+      <div id="trendChart"></div>
+      <div class="legend-inline">
+        <span><i style="background:#8E6169;color:#8E6169"></i>31.08–06.09 · прошлая неделя</span>
+        <span><i style="background:#FB4D5C;color:#FB4D5C"></i>07–13.09 · текущая неделя</span>
+      </div>
+      <div class="chart-note">Столбцы — наша выручка по бренду. Совокупно: <b id="trendTotal" style="color:var(--coral)">—</b>.</div>
+    </div>
+
+    <div class="tbl-wrap rv in">
+      <table class="dt" id="brandTable">
+        <thead><tr>
+          <th class="l" data-k="name">Бренд</th><th data-k="rev">Наша выручка ₽</th><th data-k="qty">Шт</th>
+          <th data-k="price">Ср. цена ₽</th><th data-k="market">Рынок ₽</th><th data-k="share">Доля %</th>
+          <th data-k="idx">Индекс цен</th><th data-k="growth">Δ выр. %</th><th data-k="dShare">Δ доли п.п.</th>
+          <th class="l" data-k="trend">Тренд</th><th class="l" data-k="rec">Рекомендация</th>
+        </tr></thead>
+        <tbody id="brandBody"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span class="pg-info" id="pgInfo"></span>
+      <button class="pg-btn pg-csv" id="pgCsv" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Скачать CSV по фильтру</button>
+    </div>
+    <p class="tbl-hint"><b>Клик по строке</b> — разбор бренда: доли рынка, топ-3 соперника с ценами, динамика и расчёт индекса. Переключатель «в ₽» заменяет проценты долей на выручку конкурентов.</p>
+  </div>
+</section>
+
+<!-- ================= ВКЛАДКА 2 · ТОП-3 ================= -->
+<section class="panel-tab" data-panel="2" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="sec-head rv in">
+      <div class="eyebrow">Кто забирает деньги</div>
+      <h2>Топ-3 конкурента</h2>
+      <p class="sec-sub">Срез на 13.09.2026: три крупнейших соперника по каждому бренду, их доли и средние цены. «Прочие» — длинный хвост мелких продавцов, каждый из которых меньше третьего места.</p>
+    </div>
+
+    <div class="kpi-grid rv in" id="compKpis" style="grid-template-columns:repeat(4,1fr)"></div>
+
+    <div class="chart-card rv" style="margin-bottom:16px">
+      <div class="chart-t">Структура рынка по брендам · доля выручки</div>
+      <div id="stackChart"></div>
+      <div class="legend-inline" id="stackLegend"></div>
+      <div class="chart-note">Красный сегмент — мы. Чем он короче, тем сильнее бренд занят конкурентами. Наведи курсор на сегмент — точная доля.</div>
+    </div>
+
+    <div class="tbl-wrap rv in" style="max-height:none">
+      <table class="dt" style="min-width:820px">
+        <thead><tr><th class="l">Игрок рынка</th><th>Выручка ₽</th><th>Доля %</th><th>Ср. цена ₽</th><th>Индекс к нам</th><th class="l">Позиция</th></tr></thead>
+        <tbody id="playersBody"></tbody>
+      </table>
+    </div>
+
+    <div class="bcards" id="brandCards"></div>
+  </div>
+</section>
+
+<!-- ================= ВКЛАДКА 3 · РЕКОМЕНДАЦИИ ================= -->
+<section class="panel-tab" data-panel="3" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="sec-head rv in">
+      <div class="eyebrow">Автовердикты · цена × доля</div>
+      <h2>Рекомендации по брендам</h2>
+      <p class="sec-sub">Система даёт не «кто конкурент», а действие: удерживать / снижать / повышать / усиливать продвижение. Правило применяется к фактическим числам индекса цен и изменения доли — клик по бренду открывает разбор.</p>
+    </div>
+
+    <div class="filters rv in">
+      <div class="f-grid" style="grid-template-columns:1fr 2.2fr auto">
+        <div class="f-item"><label for="rQ">Поиск по бренду</label><input class="f-in" id="rQ" type="search" placeholder="например: DENSO"></div>
+        <div class="f-item"><label>Показать группу</label><div class="seg" id="rGroup"><button type="button" data-v="" class="on">Все</button><button type="button" data-v="hold">Удерживать</button><button type="button" data-v="lower">Снижать цену</button><button type="button" data-v="raise">Повышать</button><button type="button" data-v="promo">Продвижение</button></div></div>
+        <div class="f-item"><label>&nbsp;</label><button class="f-reset" id="rReset" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Сброс</button></div>
+      </div>
+      <div class="f-summary" id="rSummary"></div>
+    </div>
+
+    <div class="rec-grid" id="recGrid"></div>
+
+    <div class="method rv" style="margin-top:20px">
+      <h3>Правила автовердикта</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Снижать цену</b>: индекс &gt; 1,03 и доля упала более чем на 0,3 п.п. Рынок наказывает за премию к цене.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Можно повышать</b>: индекс &lt; 0,97 и доля выросла более чем на 0,3 п.п. Мы дешевле и растём — забираем маржу назад.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Усилить продвижение</b>: индекс &lt; 0,97, но доля падает. Цена ни при чём — карточка, наличие, отзывы, реклама.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Удерживать</b>: всё остальное. Цена в паритете или движение доли в пределах шума — не дёргаем систему.</span></li>
+      </ul>
+      <div class="formula-box">=ЕСЛИ(И(<span class="a">индекс</span>&gt;1,03;<span class="r">Δдоли</span>&lt;-0,3);"<span class="a">СНИЖАТЬ ЦЕНУ</span>";ЕСЛИ(И(<span class="a">индекс</span>&lt;0,97;<span class="g">Δдоли</span>&gt;0,3);"<span class="c">МОЖНО ПОВЫШАТЬ</span>";ЕСЛИ(И(<span class="a">индекс</span>&lt;0,97;<span class="r">Δдоли</span>&lt;-0,3);"УСИЛИТЬ ПРОДВИЖЕНИЕ";"<span class="g">УДЕРЖИВАТЬ</span>")))</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ВКЛАДКА 4 · МЕТОДИКА ================= -->
+<section class="panel-tab" data-panel="4" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="sec-head rv in">
+      <div class="eyebrow">Как считается</div>
+      <h2>Методика и связка отчётов</h2>
+      <p class="sec-sub">Конкуренты дают ограничение сверху для любого решения по цене. Воронка показывает спрос, юнит-экономика — запас маржи, конкуренты — где рынок не примет повышение.</p>
+    </div>
+
+    <div class="logic">
+      <div class="ins rv" style="--ic:var(--red);--ig:rgba(251,77,92,.09)"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><h4>Недельный контур</h4><p>Сравниваем две последние недели: выручка, штуки, средняя цена, доля. Неделя сглаживает дневной шум и ловит реакцию рынка на цену.</p></div></div>
+      <div class="ins rv" style="--ic:var(--amber);--ig:rgba(251,191,36,.09);transition-delay:.05s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M7 12h10M10 18h4"/></svg></span><div><h4>Прокси по рынку</h4><p>Выручка рынка оценивается по объёмам аналогов на площадке. Это оценка, а не выгрузка чужих кабинетов: важна динамика и относительная позиция.</p></div></div>
+      <div class="ins rv" style="--ic:var(--cyan);--ig:rgba(34,211,238,.09);transition-delay:.1s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div><h4>Цена — не всегда причина</h4><p>Если мы дешевле, а доля падает — снижение цены только сожжёт маржу. Сначала карточка, наличие и продвижение.</p></div></div>
+      <div class="ins rv" style="--ic:var(--green);--ig:rgba(52,211,153,.09);transition-delay:.15s"><span class="ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><div><h4>Сверка сквозная</h4><p>Наша выручка (9,7 млн ₽) и штуки (3 100) — те же, что в воронке и юнит-экономике. Один срез, три отчёта, никаких расхождений.</p></div></div>
+    </div>
+
+    <div class="method rv">
+      <h3>Методика расчёта</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Доля рынка</b> — наша выручка / выручка рынка по бренду за неделю. По срезу — сумма нашей выручки / сумма рынка.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Индекс цен</b> — наша средняя цена / средневзвешенная цена топ-3 конкурента. &gt;1 = дороже рынка. По срезу взвешен по нашей выручке.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Динамика</b> — сравнение двух недель: Δ выручки в %, Δ доли в процентных пунктах. Пункты, а не проценты: доля сама по себе процент.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Топ-3</b> — кто реально забирает деньги по бренду, с долями и средними ценами. «Прочие» — хвост мелких продавцов.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Автовердикт</b> — пересечение индекса цен и направления доли. Порог шума 0,3 п.п., чтобы не реагировать на случайные колебания.</span></li>
+      </ul>
+      <div class="formula-box">ДОЛЯ % = <span class="r">наша_выручка</span> / <span class="a">выручка_рынка</span> × 100 · ИНДЕКС = <span class="r">наша_цена</span> / <span class="a">цена_конкурентов</span></div>
+      <div class="formula-box">Δ ДОЛИ (п.п.) = <span class="g">доля_текущая</span> − <span class="a">доля_прошлая</span> · Δ ВЫРУЧКИ % = (<span class="g">тек</span> / <span class="a">прошл</span> − 1) × 100</div>
+    </div>
+
+    <div class="method rv">
+      <h3>Связка с воронкой и юнит-экономикой</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><a href="Воронка.html">Воронка</a> — 174 SKU с просадкой выкупа при живом спросе. Конкуренты объясняют причину: если мы дороже рынка, выкуп падает не просто так.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><a href="Юнит-экономика.html">Юнит-экономика</a> — 174 убыточных SKU. Им снижать цену нельзя ни при каких долях рынка: сначала закуп и экономика.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Идеальное решение по цене</b>: проблемная воронка + живой спрос + запас маржи + цена выше рынка. Тогда снижение окупается объёмом, а не съедает прибыль.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Обратный случай</b>: доля растёт, цена ниже рынка, маржа здоровая — окно поднять цену на 3–5% и проверить удержание доли на следующей неделе.</span></li>
+      </ul>
+    </div>
+
+    <div class="principles">
+      <div class="pr rv"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><div><h5>Число проверяемо</h5><p>Доля, индекс и динамика раскладываются до формулы. Клик по бренду — весь расчёт и цены соперников.</p></div></div>
+      <div class="pr rv" style="transition-delay:.06s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15l3 3-3 3"/></svg></span><div><h5>Отчёт = действие</h5><p>Не список конкурентов, а вердикт по каждому бренду: удерживать, снижать, повышать, усиливать продвижение.</p></div></div>
+      <div class="pr rv" style="transition-delay:.12s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><h5>Честное демо</h5><p>Бренды, продавцы и цифры вымышленные. Структура, пороги и логика вердиктов — из рабочего отчёта.</p></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="year">2026</span> Шумелкин Е.А. · Анализ конкурентов · демо-дашборд</span>
+    <span><a href="index.html">← Портфолио</a> · <a href="Воронка.html">Воронка</a> · <a href="Юнит-экономика.html">Юнит-экономика</a> · <a href="Excel.html">Excel-модель</a></span>
+  </div>
+</footer>
+
+<!-- ================= МОДАЛ БРЕНДА ================= -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Разбор бренда">
+  <div class="modal-bg" id="modalBg"></div>
+  <div class="modal-panel">
+    <button class="m-close" id="mClose" type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <div class="m-head"><span class="m-title" id="mTitle"></span><span class="v-chip" id="mRec"></span><span class="m-code" id="mCode"></span></div>
+    <div class="m-verdict" id="mVerdict"><span class="vi" id="mVIco"></span><div><div class="vt" id="mVTitle"></div><div class="vn" id="mVNote"></div></div></div>
+    <div class="m-kpis">
+      <div class="mk"><div class="mk-l">Наша доля</div><div class="mk-v num info" id="mShare"></div></div>
+      <div class="mk"><div class="mk-l">Индекс цен</div><div class="mk-v num" id="mIdx"></div></div>
+      <div class="mk"><div class="mk-l">Наша выручка</div><div class="mk-v num" id="mRev"></div></div>
+      <div class="mk"><div class="mk-l">Δ доли за неделю</div><div class="mk-v num" id="mDShare"></div></div>
+    </div>
+    <div class="chart-t" style="margin-bottom:6px">Структура рынка бренда</div>
+    <div class="st-row" style="margin-top:0"><span class="st-label">Доли</span><span class="st-bar" id="mStack"></span><span class="st-val" id="mStackVal"></span></div>
+    <table class="m-table">
+      <thead><tr><th>Игрок</th><th>Доля %</th><th>Выручка ₽</th><th>Ср. цена ₽</th><th>К нашей цене</th></tr></thead>
+      <tbody id="mPlayers"></tbody>
     </table>
-  </div>
-</div>
-
-<div id="tops" class="panel">
-  <p class="muted" style="margin-bottom:14px;font-size:.9rem">Срез на 13.09.2026 · Автолига vs топ-3 конкурента по ключевым брендам</p>
-  <div class="comp-grid" id="compGrid"></div>
-</div>
-
-<div id="actions" class="panel">
-  <div class="grid-2">
-    <div class="card">
-      <h3>Снижать цену</h3>
-      <div class="prio-list" id="listLower"></div>
-    </div>
-    <div class="card">
-      <h3>Усилить продвижение</h3>
-      <div class="prio-list" id="listPromo"></div>
-    </div>
-  </div>
-  <div class="grid-2" style="margin-top:16px">
-    <div class="card">
-      <h3>Можно повышать цену</h3>
-      <div class="prio-list" id="listRaise"></div>
-    </div>
-    <div class="card">
-      <h3>Удерживать позиции</h3>
-      <div class="prio-list" id="listHold"></div>
+    <div class="m-formula" id="mFormula"></div>
+    <div class="m-params" id="mParams"></div>
+    <div class="m-actions">
+      <button class="act" id="mCopy" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Копировать разбор</button>
+      <a class="act" href="Юнит-экономика.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Проверить маржу</a>
+      <a class="act" href="Воронка.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8v6l-4 2v-8L3 4z"/></svg>Проверить воронку</a>
     </div>
   </div>
 </div>
 
-<div id="method" class="panel">
-  <div class="card">
-    <h3>Методика</h3>
-    <div class="insights" style="margin-top:12px">
-      <div class="insight"><strong>Доля рынка</strong> — выручка Автолиги / выручка рынка по бренду за неделю.</div>
-      <div class="insight"><strong>Отношение цен</strong> — средняя цена Автолиги / средняя цена конкурентов. &gt;1 = дороже рынка.</div>
-      <div class="insight"><strong>Динамика</strong> — сравнение двух последних недель: выручка, штуки, цена, доля.</div>
-      <div class="insight warn"><strong>Автовыводы:</strong> цена выше + доля падает → снижать; цена ниже + доля растёт → можно повышать; цена ниже + доля падает → не цена, а продвижение/карточка.</div>
-      <div class="insight ok"><strong>Топ-3</strong> — кто реально забирает деньги по бренду, с долями и средними ценами.</div>
-    </div>
-  </div>
-</div>
+<div id="toast" role="status"></div>
 
 <script>
-const DATA = {"brands":[{"brand":"AURORA","w1_rev":5834557.3,"w2_rev":6099764.4,"w3_rev":6298669.8,"w4_rev":6630178.7,"w1_share":64.7,"w4_share":68.1,"w4_price":1500,"w4_price_rel":1.1,"w4_qty":3074,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":3.4,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TECHLINE","w1_rev":491066.3,"w2_rev":513387.5,"w3_rev":530128.4,"w4_rev":558029.9,"w1_share":5.4,"w4_share":5.7,"w4_price":1537,"w4_price_rel":1.25,"w4_qty":427,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.3,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STEELRUN","w1_rev":406279.7,"w2_rev":424747.0,"w3_rev":438597.4,"w4_rev":461681.5,"w1_share":4.5,"w4_share":4.7,"w4_price":1574,"w4_price_rel":1.4,"w4_qty":288,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NEXUS","w1_rev":301174.1,"w2_rev":314863.8,"w3_rev":325131.1,"w4_rev":342243.3,"w1_share":3.3,"w4_share":3.5,"w4_price":1611,"w4_price_rel":1.55,"w4_qty":209,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"DYNAMIX","w1_rev":260688.4,"w2_rev":272537.9,"w3_rev":281425.0,"w4_rev":296236.8,"w1_share":2.8,"w4_share":3.0,"w4_price":1648,"w4_price_rel":1.7,"w4_qty":615,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.2,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VOLTRON","w1_rev":234329.5,"w2_rev":244980.8,"w3_rev":252969.3,"w4_rev":266283.5,"w1_share":2.6,"w4_share":2.7,"w4_price":1685,"w4_price_rel":1.1,"w4_qty":165,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PRIMEAUTO","w1_rev":120185.8,"w2_rev":125648.8,"w3_rev":129746.1,"w4_rev":136574.8,"w1_share":1.3,"w4_share":1.4,"w4_price":1722,"w4_price_rel":1.25,"w4_qty":36,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"OPTIMA","w1_rev":119278.6,"w2_rev":124700.4,"w3_rev":128766.7,"w4_rev":135543.9,"w1_share":1.3,"w4_share":1.4,"w4_price":1759,"w4_price_rel":1.4,"w4_qty":39,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PROTECTA","w1_rev":116997.3,"w2_rev":122315.4,"w3_rev":126303.9,"w4_rev":132951.5,"w1_share":1.3,"w4_share":1.4,"w4_price":1796,"w4_price_rel":1.55,"w4_qty":51,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TITAN","w1_rev":107289.2,"w2_rev":112165.9,"w3_rev":115823.5,"w4_rev":121919.5,"w1_share":1.2,"w4_share":1.3,"w4_price":1833,"w4_price_rel":1.7,"w4_qty":65,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"SPEEDFIX","w1_rev":104606.6,"w2_rev":109361.4,"w3_rev":112927.5,"w4_rev":118871.1,"w1_share":1.1,"w4_share":1.2,"w4_price":1870,"w4_price_rel":1.1,"w4_qty":101,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.1,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"FORCEPRO","w1_rev":70025.6,"w2_rev":73208.6,"w3_rev":75595.9,"w4_rev":79574.6,"w1_share":0.8,"w4_share":0.8,"w4_price":1907,"w4_price_rel":1.25,"w4_qty":10,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AUTOLUX","w1_rev":38761.6,"w2_rev":40523.5,"w3_rev":41844.9,"w4_rev":44047.3,"w1_share":0.5,"w4_share":0.5,"w4_price":1944,"w4_price_rel":1.4,"w4_qty":56,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"EUROPART","w1_rev":38163.3,"w2_rev":39898.0,"w3_rev":41199.0,"w4_rev":43367.4,"w1_share":0.4,"w4_share":0.4,"w4_price":1981,"w4_price_rel":1.55,"w4_qty":7,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"RALLYX","w1_rev":36502.0,"w2_rev":38161.1,"w3_rev":39405.5,"w4_rev":41479.5,"w1_share":0.4,"w4_share":0.4,"w4_price":2018,"w4_price_rel":1.7,"w4_qty":74,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"GEARMAX","w1_rev":27973.8,"w2_rev":29245.3,"w3_rev":30199.0,"w4_rev":31788.4,"w1_share":0.3,"w4_share":0.3,"w4_price":2055,"w4_price_rel":1.1,"w4_qty":59,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"MAXDRIVE","w1_rev":27569.0,"w2_rev":28822.1,"w3_rev":29762.0,"w4_rev":31328.4,"w1_share":0.3,"w4_share":0.3,"w4_price":2092,"w4_price_rel":1.25,"w4_qty":35,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"HARDCORE","w1_rev":25867.8,"w2_rev":27043.6,"w3_rev":27925.4,"w4_rev":29395.2,"w1_share":0.3,"w4_share":0.3,"w4_price":2129,"w4_price_rel":1.4,"w4_qty":10,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"QUANTUM","w1_rev":21962.4,"w2_rev":22960.7,"w3_rev":23709.4,"w4_rev":24957.3,"w1_share":0.3,"w4_share":0.3,"w4_price":2166,"w4_price_rel":1.55,"w4_qty":10,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"ULTRALINE","w1_rev":21342.3,"w2_rev":22312.4,"w3_rev":23040.0,"w4_rev":24252.6,"w1_share":0.2,"w4_share":0.2,"w4_price":2203,"w4_price_rel":1.7,"w4_qty":16,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"CORETECH","w1_rev":20349.2,"w2_rev":21274.2,"w3_rev":21967.9,"w4_rev":23124.1,"w1_share":0.2,"w4_share":0.2,"w4_price":2240,"w4_price_rel":1.1,"w4_qty":16,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"MEGAPART","w1_rev":18440.8,"w2_rev":19279.0,"w3_rev":19907.6,"w4_rev":20955.4,"w1_share":0.2,"w4_share":0.2,"w4_price":2277,"w4_price_rel":1.25,"w4_qty":3,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AXIOM","w1_rev":14566.6,"w2_rev":15228.7,"w3_rev":15725.3,"w4_rev":16552.9,"w1_share":0.2,"w4_share":0.2,"w4_price":2314,"w4_price_rel":1.4,"w4_qty":11,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"SOLIDAX","w1_rev":13908.4,"w2_rev":14540.6,"w3_rev":15014.8,"w4_rev":15805.0,"w1_share":0.2,"w4_share":0.2,"w4_price":2351,"w4_price_rel":1.55,"w4_qty":8,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NOVA","w1_rev":13009.4,"w2_rev":13600.7,"w3_rev":14044.2,"w4_rev":14783.4,"w1_share":0.2,"w4_share":0.2,"w4_price":2388,"w4_price_rel":1.7,"w4_qty":6,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"RAPID","w1_rev":12629.2,"w2_rev":13203.3,"w3_rev":13633.8,"w4_rev":14351.4,"w1_share":0.1,"w4_share":0.1,"w4_price":2425,"w4_price_rel":1.1,"w4_qty":6,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"FORGE","w1_rev":8246.5,"w2_rev":8621.3,"w3_rev":8902.4,"w4_rev":9371.0,"w1_share":0.1,"w4_share":0.1,"w4_price":2462,"w4_price_rel":1.25,"w4_qty":19,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"POWERGEAR","w1_rev":6415.1,"w2_rev":6706.7,"w3_rev":6925.4,"w4_rev":7289.9,"w1_share":0.1,"w4_share":0.1,"w4_price":2499,"w4_price_rel":1.4,"w4_qty":3,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"AUTOSHIELD","w1_rev":6080.4,"w2_rev":6356.7,"w3_rev":6564.0,"w4_rev":6909.5,"w1_share":0.1,"w4_share":0.1,"w4_price":2536,"w4_price_rel":1.55,"w4_qty":11,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STELLAR","w1_rev":5562.6,"w2_rev":5815.4,"w3_rev":6005.0,"w4_rev":6321.1,"w1_share":0.1,"w4_share":0.1,"w4_price":2573,"w4_price_rel":1.7,"w4_qty":4,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VERTEX","w1_rev":5015.6,"w2_rev":5243.5,"w3_rev":5414.5,"w4_rev":5699.5,"w1_share":0.1,"w4_share":0.1,"w4_price":2610,"w4_price_rel":1.1,"w4_qty":1,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"OMEGA","w1_rev":4643.7,"w2_rev":4854.7,"w3_rev":5013.1,"w4_rev":5276.9,"w1_share":0.1,"w4_share":0.1,"w4_price":2647,"w4_price_rel":1.25,"w4_qty":1,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"APEX","w1_rev":4003.9,"w2_rev":4185.9,"w3_rev":4322.4,"w4_rev":4549.9,"w1_share":0.0,"w4_share":0.0,"w4_price":2684,"w4_price_rel":1.4,"w4_qty":1,"w4_comp":13,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"IRONCLAD","w1_rev":3734.7,"w2_rev":3904.5,"w3_rev":4031.8,"w4_rev":4244.0,"w1_share":0.0,"w4_share":0.0,"w4_price":2721,"w4_price_rel":1.55,"w4_qty":3,"w4_comp":14,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"DRIVEON","w1_rev":3646.2,"w2_rev":3811.9,"w3_rev":3936.2,"w4_rev":4143.4,"w1_share":0.0,"w4_share":0.0,"w4_price":2758,"w4_price_rel":1.7,"w4_qty":1,"w4_comp":15,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PARTZONE","w1_rev":3415.7,"w2_rev":3571.0,"w3_rev":3687.4,"w4_rev":3881.5,"w1_share":0.0,"w4_share":0.0,"w4_price":2795,"w4_price_rel":1.1,"w4_qty":3,"w4_comp":16,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"METALPRO","w1_rev":3350.4,"w2_rev":3502.7,"w3_rev":3616.9,"w4_rev":3807.3,"w1_share":0.0,"w4_share":0.0,"w4_price":2832,"w4_price_rel":1.25,"w4_qty":23,"w4_comp":5,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"LUMEN","w1_rev":2763.1,"w2_rev":2888.7,"w3_rev":2982.9,"w4_rev":3139.9,"w1_share":0.0,"w4_share":0.0,"w4_price":2869,"w4_price_rel":1.4,"w4_qty":3,"w4_comp":6,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"TORQUE","w1_rev":2709.0,"w2_rev":2832.1,"w3_rev":2924.5,"w4_rev":3078.4,"w1_share":0.0,"w4_share":0.0,"w4_price":2906,"w4_price_rel":1.55,"w4_qty":1,"w4_comp":7,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"VELOCITY","w1_rev":2418.7,"w2_rev":2528.6,"w3_rev":2611.1,"w4_rev":2748.5,"w1_share":0.0,"w4_share":0.0,"w4_price":2943,"w4_price_rel":1.7,"w4_qty":2,"w4_comp":8,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"CHRONOS","w1_rev":2339.6,"w2_rev":2445.9,"w3_rev":2525.7,"w4_rev":2658.6,"w1_share":0.0,"w4_share":0.0,"w4_price":2980,"w4_price_rel":1.1,"w4_qty":18,"w4_comp":9,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"PULSE","w1_rev":2335.3,"w2_rev":2441.5,"w3_rev":2521.1,"w4_rev":2653.8,"w1_share":0.0,"w4_share":0.0,"w4_price":3017,"w4_price_rel":1.25,"w4_qty":1,"w4_comp":10,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"NEXGEN","w1_rev":1979.3,"w2_rev":2069.3,"w3_rev":2136.7,"w4_rev":2249.2,"w1_share":0.0,"w4_share":0.0,"w4_price":3054,"w4_price_rel":1.4,"w4_qty":1,"w4_comp":11,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"},{"brand":"STRATOS","w1_rev":1764.4,"w2_rev":1844.6,"w3_rev":1904.8,"w4_rev":2005.0,"w1_share":0.0,"w4_share":0.0,"w4_price":3091,"w4_price_rel":1.55,"w4_qty":4,"w4_comp":12,"d_rev_pct":5.3,"d_share_pp":0.0,"trend_rev":"▲ рост","trend_share":"доля растёт","conclusion_2w":"Растём быстрее рынка","recommend":"Удерживать позиции","rec_type":"hold"}],"tops":[{"brand":"AURORA","rank":"Топ-1","competitor":"АвтоМарт","our_rev":6630178.7,"comp_rev":2652071.5,"our_share":68.1,"comp_share":20.4,"our_price":1500,"comp_price":1200.0},{"brand":"AURORA","rank":"Топ-2","competitor":"ПартПро","our_rev":6630178.7,"comp_rev":3646598.3,"our_share":68.1,"comp_share":27.2,"our_price":1500,"comp_price":1500.0},{"brand":"AURORA","rank":"Топ-3","competitor":"МоторЛайн","our_rev":6630178.7,"comp_rev":4641125.1,"our_share":68.1,"comp_share":34.0,"our_price":1500,"comp_price":1800.0},{"brand":"TECHLINE","rank":"Топ-1","competitor":"ПартПро","our_rev":558029.9,"comp_rev":223212.0,"our_share":5.7,"comp_share":1.7,"our_price":1537,"comp_price":1229.6},{"brand":"TECHLINE","rank":"Топ-2","competitor":"МоторЛайн","our_rev":558029.9,"comp_rev":306916.4,"our_share":5.7,"comp_share":2.3,"our_price":1537,"comp_price":1537.0},{"brand":"TECHLINE","rank":"Топ-3","competitor":"СнабТрейд","our_rev":558029.9,"comp_rev":390620.9,"our_share":5.7,"comp_share":2.9,"our_price":1537,"comp_price":1844.4},{"brand":"STEELRUN","rank":"Топ-1","competitor":"МоторЛайн","our_rev":461681.5,"comp_rev":184672.6,"our_share":4.7,"comp_share":1.4,"our_price":1574,"comp_price":1259.2},{"brand":"STEELRUN","rank":"Топ-2","competitor":"СнабТрейд","our_rev":461681.5,"comp_rev":253924.8,"our_share":4.7,"comp_share":1.9,"our_price":1574,"comp_price":1574.0},{"brand":"STEELRUN","rank":"Топ-3","competitor":"ДетальМаркет","our_rev":461681.5,"comp_rev":323177.0,"our_share":4.7,"comp_share":2.4,"our_price":1574,"comp_price":1888.8},{"brand":"NEXUS","rank":"Топ-1","competitor":"СнабТрейд","our_rev":342243.3,"comp_rev":136897.3,"our_share":3.5,"comp_share":1.1,"our_price":1611,"comp_price":1288.8},{"brand":"NEXUS","rank":"Топ-2","competitor":"ДетальМаркет","our_rev":342243.3,"comp_rev":188233.8,"our_share":3.5,"comp_share":1.4,"our_price":1611,"comp_price":1611.0},{"brand":"NEXUS","rank":"Топ-3","competitor":"ТехноСклад","our_rev":342243.3,"comp_rev":239570.3,"our_share":3.5,"comp_share":1.8,"our_price":1611,"comp_price":1933.2},{"brand":"DYNAMIX","rank":"Топ-1","competitor":"ДетальМаркет","our_rev":296236.8,"comp_rev":118494.7,"our_share":3.0,"comp_share":0.9,"our_price":1648,"comp_price":1318.4},{"brand":"DYNAMIX","rank":"Топ-2","competitor":"ТехноСклад","our_rev":296236.8,"comp_rev":162930.2,"our_share":3.0,"comp_share":1.2,"our_price":1648,"comp_price":1648.0},{"brand":"DYNAMIX","rank":"Топ-3","competitor":"АвтоОпт","our_rev":296236.8,"comp_rev":207365.8,"our_share":3.0,"comp_share":1.5,"our_price":1648,"comp_price":1977.6},{"brand":"VOLTRON","rank":"Топ-1","competitor":"ТехноСклад","our_rev":266283.5,"comp_rev":106513.4,"our_share":2.7,"comp_share":0.8,"our_price":1685,"comp_price":1348.0},{"brand":"VOLTRON","rank":"Топ-2","competitor":"АвтоОпт","our_rev":266283.5,"comp_rev":146455.9,"our_share":2.7,"comp_share":1.1,"our_price":1685,"comp_price":1685.0},{"brand":"VOLTRON","rank":"Топ-3","competitor":"ПрофиПартс","our_rev":266283.5,"comp_rev":186398.4,"our_share":2.7,"comp_share":1.4,"our_price":1685,"comp_price":2022.0},{"brand":"PRIMEAUTO","rank":"Топ-1","competitor":"АвтоОпт","our_rev":136574.8,"comp_rev":54629.9,"our_share":1.4,"comp_share":0.4,"our_price":1722,"comp_price":1377.6},{"brand":"PRIMEAUTO","rank":"Топ-2","competitor":"ПрофиПартс","our_rev":136574.8,"comp_rev":75116.1,"our_share":1.4,"comp_share":0.6,"our_price":1722,"comp_price":1722.0},{"brand":"PRIMEAUTO","rank":"Топ-3","competitor":"РейтингАвто","our_rev":136574.8,"comp_rev":95602.4,"our_share":1.4,"comp_share":0.7,"our_price":1722,"comp_price":2066.4},{"brand":"OPTIMA","rank":"Топ-1","competitor":"ПрофиПартс","our_rev":135543.9,"comp_rev":54217.6,"our_share":1.4,"comp_share":0.4,"our_price":1759,"comp_price":1407.2},{"brand":"OPTIMA","rank":"Топ-2","competitor":"РейтингАвто","our_rev":135543.9,"comp_rev":74549.1,"our_share":1.4,"comp_share":0.6,"our_price":1759,"comp_price":1759.0},{"brand":"OPTIMA","rank":"Топ-3","competitor":"Скорость+","our_rev":135543.9,"comp_rev":94880.7,"our_share":1.4,"comp_share":0.7,"our_price":1759,"comp_price":2110.8}],"summary":[{"brand":"AURORA","our_rev":6630178.7,"our_qty":3074,"our_share":68.1,"our_price":1500,"comp_avg_price":1350.0,"price_rel":1.1,"market_rev":9735945.2,"t1_name":"АвтоМарт","t1_rev":3646598.3,"t1_share":27.2,"t1_price":1650.0,"t2_name":"ПартПро","t2_rev":2320562.5,"t2_share":17.0,"t2_price":1275.0,"t3_name":"МоторЛайн","t3_rev":1458639.3,"t3_share":10.2,"t3_price":1425.0},{"brand":"TECHLINE","our_rev":558029.9,"our_qty":427,"our_share":5.7,"our_price":1537,"comp_avg_price":1383.3,"price_rel":1.25,"market_rev":9789998.2,"t1_name":"ПартПро","t1_rev":306916.4,"t1_share":2.3,"t1_price":1690.7,"t2_name":"МоторЛайн","t2_rev":195310.5,"t2_share":1.4,"t2_price":1306.5,"t3_name":"СнабТрейд","t3_rev":122766.6,"t3_share":0.9,"t3_price":1460.1},{"brand":"STEELRUN","our_rev":461681.5,"our_qty":288,"our_share":4.7,"our_price":1574,"comp_avg_price":1416.6,"price_rel":1.4,"market_rev":9823010.6,"t1_name":"МоторЛайн","t1_rev":253924.8,"t1_share":1.9,"t1_price":1731.4,"t2_name":"СнабТрейд","t2_rev":161588.5,"t2_share":1.2,"t2_price":1337.9,"t3_name":"ДетальМаркет","t3_rev":101569.9,"t3_share":0.7,"t3_price":1495.3},{"brand":"NEXUS","our_rev":342243.3,"our_qty":209,"our_share":3.5,"our_price":1611,"comp_avg_price":1449.9,"price_rel":1.55,"market_rev":9778380.0,"t1_name":"СнабТрейд","t1_rev":188233.8,"t1_share":1.4,"t1_price":1772.1,"t2_name":"ДетальМаркет","t2_rev":119785.2,"t2_share":0.9,"t2_price":1369.3,"t3_name":"ТехноСклад","t3_rev":75293.5,"t3_share":0.5,"t3_price":1530.4},{"brand":"DYNAMIX","our_rev":296236.8,"our_qty":615,"our_share":3.0,"our_price":1648,"comp_avg_price":1483.2,"price_rel":1.7,"market_rev":9874560.0,"t1_name":"ДетальМаркет","t1_rev":162930.2,"t1_share":1.2,"t1_price":1812.8,"t2_name":"ТехноСклад","t2_rev":103682.9,"t2_share":0.8,"t2_price":1400.8,"t3_name":"АвтоОпт","t3_rev":65172.1,"t3_share":0.4,"t3_price":1565.6},{"brand":"VOLTRON","our_rev":266283.5,"our_qty":165,"our_share":2.7,"our_price":1685,"comp_avg_price":1516.5,"price_rel":1.1,"market_rev":9862351.9,"t1_name":"ТехноСклад","t1_rev":146455.9,"t1_share":1.1,"t1_price":1853.5,"t2_name":"АвтоОпт","t2_rev":93199.2,"t2_share":0.7,"t2_price":1432.2,"t3_name":"ПрофиПартс","t3_rev":58582.4,"t3_share":0.4,"t3_price":1600.8},{"brand":"PRIMEAUTO","our_rev":136574.8,"our_qty":36,"our_share":1.4,"our_price":1722,"comp_avg_price":1549.8,"price_rel":1.25,"market_rev":9755342.9,"t1_name":"АвтоОпт","t1_rev":75116.1,"t1_share":0.6,"t1_price":1894.2,"t2_name":"ПрофиПартс","t2_rev":47801.2,"t2_share":0.3,"t2_price":1463.7,"t3_name":"РейтингАвто","t3_rev":30046.5,"t3_share":0.2,"t3_price":1635.9},{"brand":"OPTIMA","our_rev":135543.9,"our_qty":39,"our_share":1.4,"our_price":1759,"comp_avg_price":1583.1,"price_rel":1.4,"market_rev":9681707.1,"t1_name":"ПрофиПартс","t1_rev":74549.1,"t1_share":0.6,"t1_price":1934.9,"t2_name":"РейтингАвто","t2_rev":47440.4,"t2_share":0.3,"t2_price":1495.1,"t3_name":"Скорость+","t3_rev":29819.7,"t3_share":0.2,"t3_price":1671.0},{"brand":"PROTECTA","our_rev":132951.5,"our_qty":51,"our_share":1.4,"our_price":1796,"comp_avg_price":1616.4,"price_rel":1.55,"market_rev":9496535.7,"t1_name":"РейтингАвто","t1_rev":73123.3,"t1_share":0.6,"t1_price":1975.6,"t2_name":"Скорость+","t2_rev":46533.0,"t2_share":0.3,"t2_price":1526.6,"t3_name":"МегаДеталь","t3_rev":29249.3,"t3_share":0.2,"t3_price":1706.2},{"brand":"TITAN","our_rev":121919.5,"our_qty":65,"our_share":1.3,"our_price":1833,"comp_avg_price":1649.7,"price_rel":1.7,"market_rev":9378423.1,"t1_name":"Скорость+","t1_rev":67055.7,"t1_share":0.5,"t1_price":2016.3,"t2_name":"МегаДеталь","t2_rev":42671.8,"t2_share":0.3,"t2_price":1558.0,"t3_name":"ОригиналПро","t3_rev":26822.3,"t3_share":0.2,"t3_price":1741.3},{"brand":"SPEEDFIX","our_rev":118871.1,"our_qty":101,"our_share":1.2,"our_price":1870,"comp_avg_price":1683.0,"price_rel":1.1,"market_rev":9905925.0,"t1_name":"МегаДеталь","t1_rev":65379.1,"t1_share":0.5,"t1_price":2057.0,"t2_name":"ОригиналПро","t2_rev":41604.9,"t2_share":0.3,"t2_price":1589.5,"t3_name":"ЗапчастьХаб","t3_rev":26151.6,"t3_share":0.2,"t3_price":1776.5},{"brand":"FORCEPRO","our_rev":79574.6,"our_qty":10,"our_share":0.8,"our_price":1907,"comp_avg_price":1716.3,"price_rel":1.25,"market_rev":7957460.0,"t1_name":"ОригиналПро","t1_rev":43766.0,"t1_share":0.3,"t1_price":2097.7,"t2_name":"ЗапчастьХаб","t2_rev":27851.1,"t2_share":0.2,"t2_price":1621.0,"t3_name":"ДрайвСток","t3_rev":17506.4,"t3_share":0.1,"t3_price":1811.6},{"brand":"AUTOLUX","our_rev":44047.3,"our_qty":56,"our_share":0.5,"our_price":1944,"comp_avg_price":1749.6,"price_rel":1.4,"market_rev":4404730.0,"t1_name":"ЗапчастьХаб","t1_rev":24226.0,"t1_share":0.2,"t1_price":2138.4,"t2_name":"ДрайвСток","t2_rev":15416.6,"t2_share":0.1,"t2_price":1652.4,"t3_name":"УльтраАвто","t3_rev":9690.4,"t3_share":0.1,"t3_price":1846.8},{"brand":"EUROPART","our_rev":43367.4,"our_qty":7,"our_share":0.4,"our_price":1981,"comp_avg_price":1782.9,"price_rel":1.55,"market_rev":4336740.0,"t1_name":"ДрайвСток","t1_rev":23852.1,"t1_share":0.2,"t1_price":2179.1,"t2_name":"УльтраАвто","t2_rev":15178.6,"t2_share":0.1,"t2_price":1683.8,"t3_name":"АвтоМарт","t3_rev":9540.8,"t3_share":0.1,"t3_price":1881.9},{"brand":"RALLYX","our_rev":41479.5,"our_qty":74,"our_share":0.4,"our_price":2018,"comp_avg_price":1816.2,"price_rel":1.7,"market_rev":4147950.0,"t1_name":"УльтраАвто","t1_rev":22813.7,"t1_share":0.2,"t1_price":2219.8,"t2_name":"АвтоМарт","t2_rev":14517.8,"t2_share":0.1,"t2_price":1715.3,"t3_name":"ПартПро","t3_rev":9125.5,"t3_share":0.1,"t3_price":1917.1}],"stats":{"n_brands":44,"hold":44,"lower":0,"raise":0,"promo":0,"grow":44,"fall":0}};
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s);};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
+var nf=new Intl.NumberFormat('ru-RU');
+function fmt(n){return isFinite(n)?nf.format(Math.round(n)):'—';}
+function fmt1(n){return isFinite(n)?n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';}
+function fmt2(n){return isFinite(n)?n.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';}
+function mln(n,d){var k=(d===undefined?1:d);return (n/1e6).toLocaleString('ru-RU',{minimumFractionDigits:k,maximumFractionDigits:k});}
+function sgn(n,d){var v=(d===undefined?fmt1(n):fmt(n));return (n>0?'+':'')+v;}
+var R=Math.round;
 
-function fmt(n){const x=Math.abs(n);const s=n<0?'−':'';if(x>=1e6)return s+(x/1e6).toFixed(1)+' млн';if(x>=1e3)return s+Math.round(x/1e3)+' тыс';return s+Math.round(x)}
-function recTag(t, text){
-  const map={hold:'tag-hold',lower:'tag-lower',raise:'tag-raise',promo:'tag-promo',other:'tag-other'};
-  return '<span class="tag '+(map[t]||'tag-other')+'">'+(text||t)+'</span>';
+/* ================= ГЕНЕРАТОР ДЕМО-ДАННЫХ =================
+   Наша выручка и штуки совпадают с воронкой и юнит-экономикой. */
+function mulberry32(a){
+  return function(){
+    a|=0;a=a+0x6D2B79F5|0;
+    var t=Math.imul(a^a>>>15,1|a);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
 }
-function shortRec(r){
-  if(!r) return '—';
-  if(r.length>55) return r.slice(0,55)+'…';
-  return r;
-}
+var OUR_TOTAL=9699983, OUR_QTY=3100, TARGET_SHARE=0.32, TARGET_IDX=0.94, TARGET_GROWTH=0.058;
+var BRANDS=[
+  {n:'BOSCH',      w:14, price:6200, idx:1.02, dS:0.1},
+  {n:'DENSO',      w:12, price:5400, idx:1.12, dS:-1.4},
+  {n:'MANN',       w:11, price:1650, idx:0.88, dS:1.6},
+  {n:'NGK',        w:10, price:1250, idx:0.99, dS:0.2},
+  {n:'SACHS',      w:9,  price:7800, idx:0.90, dS:-1.1},
+  {n:'TRW',        w:9,  price:4300, idx:1.14, dS:-0.9},
+  {n:'FEBI',       w:8,  price:2400, idx:0.86, dS:2.1},
+  {n:'VALEO',      w:7,  price:5200, idx:1.07, dS:-0.2},
+  {n:'LEMFORDER',  w:6,  price:3600, idx:0.92, dS:-1.8},
+  {n:'BREMBO',     w:5,  price:7200, idx:1.04, dS:0.4},
+  {n:'VOLRAM',     w:5,  price:2900, idx:1.15, dS:-2.2},
+  {n:'TRAX',       w:4,  price:2300, idx:0.96, dS:0.1}
+];
+var PLAYERS=[
+  {key:'us', name:'Мы · Автолига',       c:'#FB4D5C', target:null},
+  {key:'a',  name:'Конкурент A · АвтоПартс',  c:'#FBBF24', target:0.26, pm:1.05},
+  {key:'b',  name:'Конкурент B · МоторЛайн',  c:'#8B5CF6', target:0.18, pm:0.96},
+  {key:'c',  name:'Конкурент C · ТехноДрайв', c:'#22D3EE', target:0.14, pm:1.02},
+  {key:'o',  name:'Прочие продавцы',     c:'#8E6169', target:0.10}
+];
+var REC={
+  hold:{label:'Удерживать',   cls:'v-hold', color:'#34D399', glow:'rgba(52,211,153,.18)'},
+  lower:{label:'Снижать цену',cls:'v-lower',color:'#FBBF24', glow:'rgba(251,191,36,.18)'},
+  raise:{label:'Повышать',    cls:'v-raise',color:'#22D3EE', glow:'rgba(34,211,238,.18)'},
+  promo:{label:'Продвижение', cls:'v-promo',color:'#F0509E', glow:'rgba(240,80,158,.18)'}
+};
+var ICONS={
+  hold:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>',
+  lower:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+  raise:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  promo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z"/></svg>'
+};
 
-document.getElementById('k-n').textContent = DATA.stats.n_brands;
-document.getElementById('k-hold').textContent = DATA.stats.hold;
-document.getElementById('k-lower').textContent = DATA.stats.lower;
-document.getElementById('k-raise').textContent = DATA.stats.raise;
-document.getElementById('k-promo').textContent = DATA.stats.promo;
-
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.tab).classList.add('active');
+function buildData(){
+  var rnd=mulberry32(20260913), i;
+  var rows=BRANDS.map(function(b){
+    return {name:b.n,w:b.w,priceTarget:b.price,idxScenario:b.idx,dShareTarget:b.dS,
+      revJitter:0.85+rnd()*0.30, shareRaw:0.20+rnd()*0.28, gRaw:-0.08+rnd()*0.26,
+      jA:(rnd()-0.5)*0.08, jB:(rnd()-0.5)*0.08, jC:(rnd()-0.5)*0.08};
   });
-});
-
-new Chart(document.getElementById('cRec'),{
-  type:'doughnut',
-  data:{labels:['Удерживать','Снижать','Повышать','Продвижение'],
-    datasets:[{data:[DATA.stats.hold,DATA.stats.lower,DATA.stats.raise,DATA.stats.promo],
-      backgroundColor:['#22c55e','#ef4444','#3b82f6','#f97316']}]},
-  options:{plugins:{legend:{position:'bottom',labels:{color:'#8b9bb4'}}},maintainAspectRatio:false}
-});
-new Chart(document.getElementById('cTrend'),{
-  type:'doughnut',
-  data:{labels:['Рост','Падение'],datasets:[{data:[DATA.stats.grow,DATA.stats.fall],backgroundColor:['#22c55e','#ef4444']}]},
-  options:{plugins:{legend:{position:'bottom',labels:{color:'#8b9bb4'}}},maintainAspectRatio:false}
-});
-const topB = [...DATA.brands].sort((a,b)=>b.w4_rev-a.w4_rev).slice(0,8);
-new Chart(document.getElementById('cTop'),{
-  type:'bar',
-  data:{labels:topB.map(b=>b.brand),datasets:[{label:'Выручка',data:topB.map(b=>b.w4_rev),backgroundColor:'#3b82f6'}]},
-  options:{plugins:{legend:{display:false}},
-    scales:{x:{ticks:{color:'#8b9bb4',maxRotation:45},grid:{color:'#2d3a4f'}},
-            y:{ticks:{color:'#8b9bb4'},grid:{color:'#2d3a4f'}}},maintainAspectRatio:false}
-});
-
-function renderBrands(){
-  const q=document.getElementById('search').value.toLowerCase();
-  const fr=document.getElementById('fRec').value;
-  const tb=document.getElementById('brandBody'); tb.innerHTML='';
-  let n=0;
-  [...DATA.brands].sort((a,b)=>b.w4_rev-a.w4_rev).forEach(b=>{
-    if(fr && b.rec_type!==fr) return;
-    if(q && !b.brand.toLowerCase().includes(q)) return;
-    n++;
-    const tr=document.createElement('tr');
-    const dCls=b.d_rev_pct>=0?'pos':'neg';
-    const sCls=b.d_share_pp>=0?'pos':'neg';
-    tr.innerHTML=`
-      <td><strong>${b.brand}</strong></td>
-      <td class="money">${fmt(b.w4_rev)}</td>
-      <td class="money">${b.w4_qty}</td>
-      <td class="money">${b.w4_price.toLocaleString('ru')}</td>
-      <td>${b.w4_share}%</td>
-      <td>${b.w4_price_rel}</td>
-      <td class="${dCls}">${b.d_rev_pct}%</td>
-      <td class="${sCls}">${b.d_share_pp}</td>
-      <td>${b.trend_rev||'—'}</td>
-      <td>${recTag(b.rec_type, shortRec(b.recommend))}</td>`;
-    tb.appendChild(tr);
+  /* наша выручка по брендам → ровно OUR_TOTAL */
+  var wSum=0;rows.forEach(function(r){r.wRev=r.w*r.revJitter;wSum+=r.wRev;});
+  var acc=0,top=null;
+  rows.forEach(function(r){
+    r.rev=R(OUR_TOTAL*r.wRev/wSum);acc+=r.rev;
+    if(!top||r.rev>top.rev)top=r;
   });
-  document.getElementById('rowCount').textContent='Показано: '+n;
-}
-document.getElementById('search').addEventListener('input',renderBrands);
-document.getElementById('fRec').addEventListener('change',renderBrands);
-renderBrands();
-
-// Tops / summary cards
-const grid=document.getElementById('compGrid');
-DATA.summary.forEach(s=>{
-  const div=document.createElement('div');
-  div.className='comp-card';
-  const pr=s.price_rel;
-  const prTxt = pr>1.05 ? ('дороже рынка ×'+pr) : pr<0.95 ? ('дешевле рынка ×'+pr) : ('около рынка ×'+pr);
-  div.innerHTML=`
-    <h4>${s.brand} · доля ${s.our_share}% · ${prTxt}</h4>
-    <div class="comp-row"><span class="muted">Автолига</span><span class="money">${fmt(s.our_rev)} ₽ · цена ${s.our_price.toLocaleString('ru')}</span></div>
-    <div class="comp-row"><span>1. ${s.t1_name}</span><span class="money">${fmt(s.t1_rev)} · ${s.t1_share}% · ${s.t1_price.toLocaleString('ru')} ₽</span></div>
-    <div class="comp-row"><span>2. ${s.t2_name||'—'}</span><span class="money">${s.t2_name?fmt(s.t2_rev)+' · '+s.t2_share+'% · '+s.t2_price.toLocaleString('ru')+' ₽':'—'}</span></div>
-    <div class="comp-row"><span>3. ${s.t3_name||'—'}</span><span class="money">${s.t3_name?fmt(s.t3_rev)+' · '+s.t3_share+'% · '+s.t3_price.toLocaleString('ru')+' ₽':'—'}</span></div>`;
-  grid.appendChild(div);
-});
-
-function fillList(id, type, limit=8){
-  const box=document.getElementById(id);
-  const items=[...DATA.brands].filter(b=>b.rec_type===type).sort((a,b)=>b.w4_rev-a.w4_rev).slice(0,limit);
-  if(!items.length){box.innerHTML='<div class="muted">Нет брендов в этой группе</div>';return}
-  items.forEach((b,i)=>{
-    const div=document.createElement('div');
-    div.className='prio-item';
-    div.innerHTML=`
-      <div class="num">${i+1}</div>
-      <div>
-        <div style="font-weight:600">${b.brand}</div>
-        <div class="muted" style="font-size:.8rem;margin-top:2px">${shortRec(b.recommend)}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="money">${fmt(b.w4_rev)}</div>
-        <div class="muted" style="font-size:.8rem;margin-top:2px">доля ${b.w4_share}% · ×${b.w4_price_rel}</div>
-      </div>`;
-    box.appendChild(div);
+  top.rev+=OUR_TOTAL-acc;
+  /* штуки → ровно OUR_QTY, цены около целевых */
+  var qAcc=0,qTop=null;
+  rows.forEach(function(r){
+    r.qty=Math.max(1,R(r.rev/r.priceTarget));qAcc+=r.qty;
+    if(!qTop||r.qty>qTop.qty)qTop=r;
   });
+  var kq=OUR_QTY/qAcc;
+  qAcc=0;rows.forEach(function(r){r.qty=Math.max(1,R(r.qty*kq));qAcc+=r.qty;});
+  qTop.qty+=OUR_QTY-qAcc;
+  rows.forEach(function(r){r.price=r.rev/r.qty;});
+  /* доли рынка → агрегат ровно 32% (бинарный поиск множителя) */
+  var targetMarket=OUR_TOTAL/TARGET_SHARE, lo=0.3, hi=3.0, m, tot;
+  for(i=0;i<70;i++){
+    m=(lo+hi)/2;tot=0;
+    rows.forEach(function(r){tot+=r.rev/Math.min(0.62,Math.max(0.10,r.shareRaw*m));});
+    if(tot>targetMarket)lo=m;else hi=m;
+  }
+  m=(lo+hi)/2;
+  rows.forEach(function(r){
+    r.share=Math.min(0.62,Math.max(0.10,r.shareRaw*m));
+    r.market=r.rev/r.share;
+  });
+  /* рост выручки → агрегат ровно +5,8% */
+  var targetPrev=OUR_TOTAL/(1+TARGET_GROWTH);
+  lo=-0.6;hi=0.9;
+  for(i=0;i<70;i++){
+    m=(lo+hi)/2;tot=0;
+    rows.forEach(function(r){tot+=r.rev/(1+Math.min(0.40,Math.max(-0.25,r.gRaw+m)));});
+    if(tot>targetPrev)lo=m;else hi=m;
+  }
+  m=(lo+hi)/2;
+  rows.forEach(function(r){
+    r.growth=Math.min(0.40,Math.max(-0.25,r.gRaw+m));
+    r.prevRev=r.rev/(1+r.growth);
+    r.dShare=r.dShareTarget/100;
+    r.prevShare=Math.max(0.04,r.share-r.dShare);
+    r.prevMarket=r.prevRev/r.prevShare;
+    r.marketGrowth=r.market/r.prevMarket-1;
+  });
+  /* конкуренты: доли → агрегаты 26 / 18 / 14 %, прочие — остаток */
+  var marketTotal=0;rows.forEach(function(r){marketTotal+=r.market;});
+  rows.forEach(function(r){
+    var rest=1-r.share;
+    r.rawA=rest*(0.3824+r.jA);
+    r.rawB=rest*(0.2647+r.jB);
+    r.rawC=rest*(0.2059+r.jC);
+  });
+  ['A','B','C'].forEach(function(k,idx){
+    var target=PLAYERS[idx+1].target*marketTotal, sum=0;
+    rows.forEach(function(r){sum+=r.market*r['raw'+k];});
+    var kk=sum>0?target/sum:1;
+    rows.forEach(function(r){r['s'+k]=r['raw'+k]*kk;});
+  });
+  rows.forEach(function(r){
+    var sum=r.sA+r.sB+r.sC, rest=1-r.share;
+    if(sum>rest*0.94){
+      var f=rest*0.94/sum;
+      r.sA*=f;r.sB*=f;r.sC*=f;
+    }
+    r.sO=Math.max(0.005,rest-r.sA-r.sB-r.sC);
+    r.revA=r.market*r.sA;r.revB=r.market*r.sB;r.revC=r.market*r.sC;r.revO=r.market*r.sO;
+  });
+  /* цены конкурентов → взвешенный индекс ровно 0,94 */
+  rows.forEach(function(r){
+    var base=r.price/r.idxScenario;
+    r.pA=base*1.05;r.pB=base*0.96;r.pC=base*1.02;
+    var wsum=r.revA+r.revB+r.revC;
+    r.compAvg=(r.revA*r.pA+r.revB*r.pB+r.revC*r.pC)/wsum;
+    r.idxRaw=r.price/r.compAvg;
+  });
+  var weighted=0;rows.forEach(function(r){weighted+=(r.rev/OUR_TOTAL)*r.idxRaw;});
+  var t=weighted/TARGET_IDX;
+  rows.forEach(function(r){
+    r.pA*=t;r.pB*=t;r.pC*=t;r.compAvg*=t;
+    r.idx=r.price/r.compAvg;
+    r.pO=r.compAvg*0.98;
+    r.trend=r.growth>0.005?'up':(r.growth<-0.005?'down':'flat');
+    if(r.idx>1.03&&r.dShare*100<-0.3)r.rec='lower';
+    else if(r.idx<0.97&&r.dShare*100>0.3)r.rec='raise';
+    else if(r.idx<0.97&&r.dShare*100<-0.3)r.rec='promo';
+    else r.rec='hold';
+  });
+  rows.sort(function(a,b){return b.rev-a.rev;});
+  rows.forEach(function(r,i){r.i=i;});
+  return rows;
 }
-fillList('listLower','lower');
-fillList('listPromo','promo');
-fillList('listRaise','raise');
-fillList('listHold','hold',6);
+
+var DATA=buildData();
+var T={rev:0,qty:0,market:0,prevRev:0,prevMarket:0,revA:0,revB:0,revC:0,revO:0};
+DATA.forEach(function(r){
+  T.rev+=r.rev;T.qty+=r.qty;T.market+=r.market;T.prevRev+=r.prevRev;T.prevMarket+=r.prevMarket;
+  T.revA+=r.revA;T.revB+=r.revB;T.revC+=r.revC;T.revO+=r.revO;
+});
+T.share=T.rev/T.market*100;
+T.prevShare=T.prevRev/T.prevMarket*100;
+T.dShare=T.share-T.prevShare;
+T.growth=T.rev/T.prevRev-1;
+T.marketGrowth=T.market/T.prevMarket-1;
+T.idx=0;DATA.forEach(function(r){T.idx+=(r.rev/T.rev)*r.idx;});
+T.price=T.rev/T.qty;
+T.compPrice=(T.revA+T.revB+T.revC)/(T.market*(0.26+0.18+0.14))*T.price/T.idx;
+T.top3=(T.revA+T.revB+T.revC)/T.market*100;
+var COUNT={hold:0,lower:0,raise:0,promo:0};
+DATA.forEach(function(r){COUNT[r.rec]++;});
+
+/* ================= KPI ================= */
+function renderKPI(){
+  var cards=[
+    {l:'Наша доля рынка',v:fmt1(T.share)+'%',s:'было '+fmt1(T.prevShare)+'% · '+sgn(T.dShare)+' п.п.',c:'var(--coral)',g:'rgba(255,122,107,.35)'},
+    {l:'Индекс цен',v:fmt2(T.idx),s:'мы дешевле рынка на '+fmt1((1-T.idx)*100)+'%',c:'var(--amber)',g:'rgba(251,191,36,.32)'},
+    {l:'Наша выручка',v:mln(T.rev)+' млн ₽',s:sgn(T.growth*100)+'% за неделю',c:'var(--green)',g:'rgba(52,211,153,.32)'},
+    {l:'Объём рынка',v:mln(T.market)+' млн ₽',s:sgn(T.marketGrowth*100)+'% за неделю',c:'var(--violet)',g:'rgba(139,92,246,.3)'},
+    {l:'Топ-3 забирают',v:fmt1(T.top3)+'%',s:'три крупнейших соперника',c:'var(--magenta)',g:'rgba(240,80,158,.32)'},
+    {l:'Брендов в срезе',v:String(DATA.length),s:fmt(T.qty)+' шт · чек '+fmt(T.price)+' ₽',c:'var(--text)',g:'transparent'}
+  ];
+  $('#kpiGrid').innerHTML=cards.map(function(k){
+    return '<div class="kpi" style="--kc:'+k.c+';--kg:'+k.g+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v num">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
+  }).join('');
+  var rs=[
+    {k:'hold',t:'Удерживать цену',s:'доля стабильна или растёт'},
+    {k:'lower',t:'Снижать цену',s:'цена выше, доля падает'},
+    {k:'raise',t:'Можно повышать',s:'цена ниже, доля растёт'},
+    {k:'promo',t:'Усилить продвижение',s:'цена ниже, доля падает'}
+  ];
+  $('#recStrip').innerHTML=rs.map(function(x){
+    var m=REC[x.k];
+    return '<div class="rs" style="--rc:'+m.color+';--rg:'+m.glow+'"><span class="rs-n">'+COUNT[x.k]+'</span><div><div class="rs-t">'+x.t+'</div><div class="rs-s">'+x.s+'</div></div></div>';
+  }).join('');
+  $('#cntRec').textContent=String(COUNT.lower+COUNT.promo);
+}
+
+/* ================= ГРАФИКИ ================= */
+function renderDonut(){
+  var segs=[
+    {n:'Мы · Автолига',v:T.share,c:'#FB4D5C',rev:T.rev},
+    {n:'Конкурент A',v:T.revA/T.market*100,c:'#FBBF24',rev:T.revA},
+    {n:'Конкурент B',v:T.revB/T.market*100,c:'#8B5CF6',rev:T.revB},
+    {n:'Конкурент C',v:T.revC/T.market*100,c:'#22D3EE',rev:T.revC},
+    {n:'Прочие',v:T.revO/T.market*100,c:'#8E6169',rev:T.revO}
+  ];
+  var r=62,C=2*Math.PI*r,off=0,svg='';
+  segs.forEach(function(s){
+    var len=s.v/100*C;
+    svg+='<circle r="'+r+'" cx="90" cy="90" fill="none" stroke="'+s.c+'" stroke-width="24" stroke-dasharray="'+Math.max(0,len-2)+' '+(C-Math.max(0,len-2))+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 90 90)" style="filter:drop-shadow(0 0 6px '+s.c+')"><title>'+s.n+': '+fmt1(s.v)+'%</title></circle>';
+    off+=len;
+  });
+  $('#donut').innerHTML='<svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Доли рынка">'+svg+
+    '<text x="90" y="84" text-anchor="middle" fill="#FBEBEC" font-size="20" font-weight="700">'+fmt1(T.share)+'%</text>'+
+    '<text x="90" y="104" text-anchor="middle" fill="#8E6169" font-size="10">НАША ДОЛЯ</text></svg>';
+  $('#donutLegend').innerHTML=segs.map(function(s){
+    return '<div class="dl-row"><i style="background:'+s.c+';color:'+s.c+'"></i><span>'+s.n+'</span><span class="dl-m" style="color:'+s.c+'">'+fmt1(s.v)+'% · '+mln(s.rev)+' млн</span></div>';
+  }).join('');
+}
+function renderTopBrands(){
+  var max=1;DATA.forEach(function(r){if(r.rev>max)max=r.rev;});
+  $('#topBrands').innerHTML=DATA.map(function(r){
+    var c=REC[r.rec].color;
+    return '<div class="br-row"><span class="br-label">'+r.name+'</span>'+
+      '<span class="br-track"><span class="br-fill" style="width:'+(r.rev/max*100)+'%;background:'+c+';color:'+c+'"></span></span>'+
+      '<span class="br-val"><b>'+mln(r.rev,2)+' млн ₽</b> · '+fmt1(r.share)+'%</span></div>';
+  }).join('');
+}
+function renderGauge(){
+  var maxDev=0.20;
+  $('#indexGauge').innerHTML=DATA.slice().sort(function(a,b){return a.idx-b.idx;}).map(function(r){
+    var dev=r.idx-1, w=Math.min(Math.abs(dev)/maxDev*50,50);
+    var left=dev<0?50-w:50;
+    var c=dev<-0.03?'#22D3EE':(dev>0.03?'#FBBF24':'#8E6169');
+    return '<div class="gauge-row"><span class="gauge-label">'+r.name+'</span>'+
+      '<span class="gauge"><span class="gauge-mid"></span><span class="gauge-fill" style="left:'+left+'%;width:'+Math.max(w,0.6)+'%;background:'+c+';box-shadow:0 0 10px '+c+'"></span></span>'+
+      '<span class="gauge-val" style="color:'+c+'">'+fmt2(r.idx)+'</span></div>';
+  }).join('');
+}
+function renderTrend(){
+  var W=1000,H=280,x0=52,x1=980,y0=20,y1=214,plot=y1-y0;
+  var max=1;DATA.forEach(function(r){max=Math.max(max,r.rev,r.prevRev);});
+  var bw=(x1-x0)/DATA.length,bars='',labels='',grid='';
+  [0,25,50,75,100].forEach(function(p){
+    var y=y1-p/100*plot;
+    grid+='<line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#3A161C"/>';
+    grid+='<text x="'+(x0-8)+'" y="'+(y+3)+'" text-anchor="end" fill="#8E6169" font-size="9">'+mln(max*p/100,1)+'</text>';
+  });
+  DATA.forEach(function(r,i){
+    var gx=x0+i*bw, w=(bw-14)/2;
+    var h1=r.prevRev/max*plot,h2=r.rev/max*plot;
+    bars+='<rect x="'+(gx+6)+'" y="'+(y1-h1)+'" width="'+w+'" height="'+h1+'" rx="3" fill="#8E6169" opacity="0.75"><title>'+r.name+' · прошлая: '+fmt(r.prevRev)+' ₽</title></rect>';
+    bars+='<rect x="'+(gx+8+w)+'" y="'+(y1-h2)+'" width="'+w+'" height="'+h2+'" rx="3" fill="#FB4D5C" style="filter:drop-shadow(0 0 5px #FB4D5C)"><title>'+r.name+' · текущая: '+fmt(r.rev)+' ₽ ('+sgn(r.growth*100)+'%)</title></rect>';
+    var cx=gx+bw/2;
+    labels+='<text x="'+cx+'" y="'+(y1+18)+'" fill="#C79BA1" font-size="9.5" text-anchor="end" transform="rotate(-32 '+cx+' '+(y1+18)+')">'+r.name+'</text>';
+    var gc=r.growth>=0?'#34D399':'#FB4D5C';
+    labels+='<text x="'+cx+'" y="'+(y1-Math.max(h1,h2)-7)+'" fill="'+gc+'" font-size="9" text-anchor="middle">'+sgn(r.growth*100)+'%</text>';
+  });
+  $('#trendChart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Тренд выручки по брендам">'+grid+bars+labels+'<text x="'+(x0-8)+'" y="'+(y0-6)+'" text-anchor="end" fill="#8E6169" font-size="9">млн ₽</text></svg>';
+  $('#trendTotal').textContent=mln(T.prevRev)+' → '+mln(T.rev)+' млн ₽ ('+sgn(T.growth*100)+'%)';
+}
+function renderStack(){
+  $('#stackChart').innerHTML=DATA.map(function(r){
+    var segs=[[r.share,'#FB4D5C','Мы'],[r.sA*100,'#FBBF24','A'],[r.sB*100,'#8B5CF6','B'],[r.sC*100,'#22D3EE','C'],[r.sO*100,'#8E6169','Прочие']];
+    return '<div class="st-row"><span class="st-label">'+r.name+'</span><span class="st-bar">'+
+      segs.map(function(s){return '<div class="st-seg" style="width:'+s[0]+'%;background:'+s[1]+'" title="'+s[2]+': '+fmt1(s[0])+'%"></div>';}).join('')+
+      '</span><span class="st-val">'+fmt1(r.share)+'%</span></div>';
+  }).join('');
+  $('#stackLegend').innerHTML=PLAYERS.map(function(p){
+    return '<span><i style="background:'+p.c+';color:'+p.c+'"></i>'+p.name+'</span>';
+  }).join('');
+}
+function renderCompKpis(){
+  var rows=[
+    {l:'Конкурент A · АвтоПартс',v:fmt1(T.revA/T.market*100)+'%',s:mln(T.revA)+' млн ₽ · ср. цена '+fmt(DATA.reduce(function(a,r){return a+r.pA*r.revA;},0)/T.revA)+' ₽',c:'#FBBF24',g:'rgba(251,191,36,.3)'},
+    {l:'Конкурент B · МоторЛайн',v:fmt1(T.revB/T.market*100)+'%',s:mln(T.revB)+' млн ₽ · ср. цена '+fmt(DATA.reduce(function(a,r){return a+r.pB*r.revB;},0)/T.revB)+' ₽',c:'#8B5CF6',g:'rgba(139,92,246,.3)'},
+    {l:'Конкурент C · ТехноДрайв',v:fmt1(T.revC/T.market*100)+'%',s:mln(T.revC)+' млн ₽ · ср. цена '+fmt(DATA.reduce(function(a,r){return a+r.pC*r.revC;},0)/T.revC)+' ₽',c:'#22D3EE',g:'rgba(34,211,238,.3)'},
+    {l:'Прочие продавцы',v:fmt1(T.revO/T.market*100)+'%',s:mln(T.revO)+' млн ₽ · длинный хвост',c:'#8E6169',g:'rgba(142,97,105,.25)'}
+  ];
+  $('#compKpis').innerHTML=rows.map(function(k){
+    return '<div class="kpi" style="--kc:'+k.c+';--kg:'+k.g+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v num">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
+  }).join('');
+}
+function renderPlayers(){
+  var pA=DATA.reduce(function(a,r){return a+r.pA*r.revA;},0)/T.revA;
+  var pB=DATA.reduce(function(a,r){return a+r.pB*r.revB;},0)/T.revB;
+  var pC=DATA.reduce(function(a,r){return a+r.pC*r.revC;},0)/T.revC;
+  var rows=[
+    {n:'Мы · Автолига',c:'#FB4D5C',rev:T.rev,share:T.share,price:T.price,pos:'наша позиция',us:true},
+    {n:'Конкурент A · АвтоПартс',c:'#FBBF24',rev:T.revA,share:T.revA/T.market*100,price:pA,pos:'лидер рынка'},
+    {n:'Конкурент B · МоторЛайн',c:'#8B5CF6',rev:T.revB,share:T.revB/T.market*100,price:pB,pos:'второй по обороту'},
+    {n:'Конкурент C · ТехноДрайв',c:'#22D3EE',rev:T.revC,share:T.revC/T.market*100,price:pC,pos:'третий по обороту'},
+    {n:'Прочие продавцы',c:'#8E6169',rev:T.revO,share:T.revO/T.market*100,price:pC*0.98,pos:'длинный хвост'}
+  ];
+  $('#playersBody').innerHTML=rows.map(function(r){
+    return '<tr style="cursor:default'+(r.us?';background:rgba(251,77,92,.07)':'')+'"><td class="l"><span class="sw" style="display:inline-flex;align-items:center;gap:8px"><i style="width:9px;height:9px;border-radius:3px;background:'+r.c+';box-shadow:0 0 7px '+r.c+'"></i><span class="nm">'+r.n+'</span></span></td>'+
+      '<td>'+fmt(r.rev)+'</td><td style="color:'+r.c+';font-weight:700">'+fmt1(r.share)+'</td><td>'+fmt(r.price)+'</td>'+
+      '<td class="'+(r.price/T.price>1.03?'warn':(r.price/T.price<0.97?'pos':'mut'))+'">'+(r.us?'—':fmt2(r.price/T.price))+'</td>'+
+      '<td class="l mut">'+r.pos+'</td></tr>';
+  }).join('')+
+  '<tr class="total" style="cursor:default"><td class="l">Рынок целиком</td><td>'+fmt(T.market)+'</td><td>100,0</td><td class="mut">—</td><td class="mut">—</td><td class="l mut">12 брендов · неделя</td></tr>';
+}
+function renderBrandCards(){
+  $('#brandCards').innerHTML=DATA.map(function(r){
+    var segs=[[r.share,'#FB4D5C'],[r.sA*100,'#FBBF24'],[r.sB*100,'#8B5CF6'],[r.sC*100,'#22D3EE'],[r.sO*100,'#8E6169']];
+    var comp=[['A · АвтоПартс',r.sA*100,r.pA,'#FBBF24'],['B · МоторЛайн',r.sB*100,r.pB,'#8B5CF6'],['C · ТехноДрайв',r.sC*100,r.pC,'#22D3EE']];
+    var m=REC[r.rec];
+    return '<div class="bc rv" data-i="'+r.i+'"><div class="bc-head"><span class="bc-name">'+r.name+'</span><span class="bc-share">'+fmt1(r.share)+'%</span></div>'+
+      '<div class="bc-bar">'+segs.map(function(s){return '<div style="width:'+s[0]+'%;background:'+s[1]+'"></div>';}).join('')+'</div>'+
+      comp.map(function(c){
+        return '<div class="bc-row"><i style="background:'+c[3]+'"></i><span class="n">'+c[0]+'</span><span class="s">'+fmt1(c[1])+'%</span><span class="p">'+fmt(c[2])+' ₽</span></div>';
+      }).join('')+
+      '<div class="bc-foot"><span class="v-chip '+m.cls+'">'+m.label+'</span><span class="mono" style="font-size:10.5px;color:var(--dim)">индекс '+fmt2(r.idx)+'</span></div></div>';
+  }).join('');
+}
+
+/* ================= ТАБЛИЦА БРЕНДОВ ================= */
+var state={q:'',rec:'',trend:'',idx:'',sort:'rev',dir:-1,money:false,risk:false};
+var SORT_LABEL={name:'Бренд',rev:'Выручка',qty:'Шт',price:'Цена',market:'Рынок',share:'Доля',idx:'Индекс',growth:'Δ выручки',dShare:'Δ доли',trend:'Тренд',rec:'Рекомендация'};
+function trendCell(r){
+  if(r.trend==='up')return '<span class="trend t-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>рост</span>';
+  if(r.trend==='down')return '<span class="trend t-down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>падение</span>';
+  return '<span class="trend t-flat">—</span>';
+}
+function filtered(){
+  var q=state.q.trim().toLowerCase();
+  var arr=DATA.filter(function(r){
+    if(q&&r.name.toLowerCase().indexOf(q)<0)return false;
+    if(state.rec&&r.rec!==state.rec)return false;
+    if(state.trend==='up'&&!(r.growth>0.005))return false;
+    if(state.trend==='down'&&!(r.growth<-0.005))return false;
+    if(state.idx==='below'&&!(r.idx<0.97))return false;
+    if(state.idx==='above'&&!(r.idx>1.03))return false;
+    if(state.idx==='par'&&!(r.idx>=0.97&&r.idx<=1.03))return false;
+    if(state.risk&&!(r.dShare<-0.003))return false;
+    return true;
+  });
+  var k=state.sort,d=state.dir;
+  arr.sort(function(a,b){
+    if(k==='name')return a.name<b.name?-d:(a.name>b.name?d:0);
+    if(k==='trend')return (a.growth-b.growth)*d;
+    if(k==='rec'){var o={hold:0,raise:1,promo:2,lower:3};return (o[a.rec]-o[b.rec])*d;}
+    return (a[k]-b[k])*d;
+  });
+  return arr;
+}
+function syncSortSelect(){
+  var sel=$('#fSort'),val=state.sort+':'+state.dir,found=false;
+  Array.prototype.forEach.call(sel.options,function(o){if(o.value===val)found=true;});
+  if(!found){
+    var o=document.createElement('option');
+    o.value=val;o.textContent=(SORT_LABEL[state.sort]||state.sort)+' '+(state.dir<0?'↓':'↑');
+    sel.appendChild(o);
+  }
+  sel.value=val;
+}
+function renderTable(){
+  var arr=filtered(),body=$('#brandBody');
+  if(!arr.length){
+    body.innerHTML='<tr><td class="empty" colspan="11">Ничего не найдено. Сбросьте фильтры или измените запрос.</td></tr>';
+  }else{
+    body.innerHTML=arr.map(function(r){
+      var m=REC[r.rec];
+      var shareCell=state.money?fmt(r.market*r.share):fmt1(r.share);
+      return '<tr data-i="'+r.i+'"><td class="l"><span class="nm">'+r.name+'</span><br><span class="cd">рынок '+mln(r.market,2)+' млн ₽</span></td>'+
+        '<td>'+fmt(r.rev)+'</td><td>'+fmt(r.qty)+'</td><td>'+fmt(r.price)+'</td><td class="mut">'+fmt(r.market)+'</td>'+
+        '<td style="color:var(--coral);font-weight:700">'+shareCell+(state.money?' ₽':'')+'</td>'+
+        '<td class="'+(r.idx>1.03?'warn':(r.idx<0.97?'pos':'mut'))+'">'+fmt2(r.idx)+'</td>'+
+        '<td class="'+(r.growth>=0?'pos':'neg')+'">'+sgn(r.growth*100)+'</td>'+
+        '<td class="'+(r.dShare>=0?'pos':'neg')+'">'+sgn(r.dShare*100)+'</td>'+
+        '<td class="l">'+trendCell(r)+'</td>'+
+        '<td class="l"><span class="v-chip '+m.cls+'">'+m.label+'</span></td></tr>';
+    }).join('');
+    var sumRev=arr.reduce(function(a,r){return a+r.rev;},0);
+    var sumMkt=arr.reduce(function(a,r){return a+r.market;},0);
+    var sumPrev=arr.reduce(function(a,r){return a+r.prevRev;},0);
+    var idxW=sumRev>0?arr.reduce(function(a,r){return a+r.idx*r.rev;},0)/sumRev:0;
+    body.innerHTML+='<tr class="total" style="cursor:default"><td class="l">Итого по выборке</td><td>'+fmt(sumRev)+'</td>'+
+      '<td>'+fmt(arr.reduce(function(a,r){return a+r.qty;},0))+'</td><td class="mut">—</td><td>'+fmt(sumMkt)+'</td>'+
+      '<td style="color:var(--coral)">'+(sumMkt>0?fmt1(sumRev/sumMkt*100):'0,0')+'</td>'+
+      '<td>'+fmt2(idxW)+'</td><td class="'+(sumRev>=sumPrev?'pos':'neg')+'">'+(sumPrev>0?sgn((sumRev/sumPrev-1)*100):'—')+'</td>'+
+      '<td class="mut">—</td><td class="l mut">'+arr.length+' брендов</td><td class="l mut">—</td></tr>';
+  }
+  var rev=arr.reduce(function(a,r){return a+r.rev;},0);
+  var mkt=arr.reduce(function(a,r){return a+r.market;},0);
+  var falling=arr.filter(function(r){return r.dShare<-0.003;}).length;
+  $('#fSummary').innerHTML='<span>Брендов: <b>'+arr.length+'</b></span>'+
+    '<span>Наша выручка: <b>'+fmt(rev)+' ₽</b></span>'+
+    '<span>Доля выборки: <b>'+(mkt>0?fmt1(rev/mkt*100):'0,0')+'%</b></span>'+
+    '<span class="dn">Доля падает: <b>'+falling+'</b></span>'+
+    '<span class="up">Растёт выручка: <b>'+arr.filter(function(r){return r.growth>0.005;}).length+'</b></span>';
+  $('#pgInfo').textContent='Показано '+arr.length+' из '+DATA.length+' брендов · срез 13.09.2026';
+  $$('#brandTable thead th').forEach(function(th){
+    var k=th.dataset.k,base=th.textContent.replace(/[▲▼]\s*$/,'').trim();
+    th.innerHTML=base+(k===state.sort?' <span class="arr">'+(state.dir<0?'▼':'▲')+'</span>':'');
+  });
+  syncSortSelect();
+}
+
+/* ================= РЕКОМЕНДАЦИИ ================= */
+var rState={q:'',group:''};
+function renderRec(){
+  var q=rState.q.trim().toLowerCase();
+  var match=function(r){return !q||r.name.toLowerCase().indexOf(q)>=0;};
+  var groups=[
+    {k:'hold',t:'Удерживать позиции',d:'Цена в паритете или доля не падает. Не дёргаем систему: ресурс уходит туда, где есть разрыв.'},
+    {k:'lower',t:'Снижать цену',d:'Мы дороже рынка, и доля уходит. Проверить маржу и снижать точечно, по SKU с живым спросом.'},
+    {k:'raise',t:'Можно повышать цену',d:'Мы дешевле рынка и растём. Окно забрать маржу: +3–5% и контроль доли на следующей неделе.'},
+    {k:'promo',t:'Усилить продвижение',d:'Цена ниже рынка, но доля падает — дело не в цене. Карточка, наличие, отзывы, реклама.'}
+  ];
+  var total=0;
+  $('#recGrid').innerHTML=groups.map(function(g){
+    if(rState.group&&rState.group!==g.k)return '';
+    var list=DATA.filter(function(r){return r.rec===g.k&&match(r);});
+    total+=list.length;
+    var m=REC[g.k];
+    return '<div class="rc rv" style="--rc:'+m.color+';--rg:'+m.glow+'">'+
+      '<div class="rc-head"><span class="rc-ico">'+ICONS[g.k]+'</span><span class="rc-t">'+g.t+'</span><span class="rc-c">'+list.length+'</span></div>'+
+      '<p class="rc-d">'+g.d+'</p>'+
+      (list.length?'<ul class="rc-list">'+list.map(function(r){
+        return '<li data-i="'+r.i+'"><span class="b">'+r.name+'</span><span class="v-chip '+m.cls+'">индекс '+fmt2(r.idx)+'</span><span class="m">доля '+fmt1(r.share)+'% · '+sgn(r.dShare*100)+' п.п.<br>'+mln(r.rev,2)+' млн ₽</span></li>';
+      }).join('')+'</ul>':'<div class="rc-empty">По фильтру брендов нет.</div>')+
+    '</div>';
+  }).join('');
+  $('#rSummary').innerHTML='<span>Показано брендов: <b>'+total+'</b></span>'+
+    '<span class="dn">Требуют действия: <b>'+DATA.filter(function(r){return (r.rec==='lower'||r.rec==='promo')&&match(r);}).length+'</b></span>'+
+    '<span class="up">Окно повышения: <b>'+DATA.filter(function(r){return r.rec==='raise'&&match(r);}).length+'</b></span>';
+  $$('#recGrid .rv').forEach(function(el){el.classList.add('in');});
+}
+
+/* ================= МОДАЛ ================= */
+var modalRow=null;
+function openModal(i){
+  var r=DATA[i];if(!r)return;
+  modalRow=r;
+  var m=REC[r.rec];
+  $('#mTitle').textContent=r.name;
+  var rc=$('#mRec');rc.textContent=m.label;rc.className='v-chip '+m.cls;
+  $('#mCode').textContent='рынок '+mln(r.market,2)+' млн ₽ · неделя 07–13.09.2026';
+  var mv=$('#mVerdict');mv.className='m-verdict mv-'+r.rec;
+  $('#mVIco').innerHTML=ICONS[r.rec];
+  $('#mVTitle').textContent=m.label+' · '+r.name;
+  var notes={
+    hold:'Индекс '+fmt2(r.idx)+', доля '+fmt1(r.share)+'% ('+sgn(r.dShare*100)+' п.п.). Существенного разрыва нет — удерживаем цену и наблюдаем.',
+    lower:'Мы дороже рынка (индекс '+fmt2(r.idx)+'), доля упала на '+fmt1(-r.dShare*100)+' п.п. Проверить маржу и снижать цену точечно по SKU с живым спросом.',
+    raise:'Мы дешевле рынка (индекс '+fmt2(r.idx)+'), доля выросла на '+fmt1(r.dShare*100)+' п.п. Окно поднять цену на 3–5% и проверить удержание доли.',
+    promo:'Мы дешевле рынка (индекс '+fmt2(r.idx)+'), но доля упала на '+fmt1(-r.dShare*100)+' п.п. Причина не в цене: карточка, наличие, отзывы, продвижение.'
+  };
+  $('#mVNote').textContent=notes[r.rec];
+  $('#mShare').textContent=fmt1(r.share)+'%';
+  var mi=$('#mIdx');mi.textContent=fmt2(r.idx);
+  mi.className='mk-v num '+(r.idx>1.03?'warn':(r.idx<0.97?'pos':''));
+  $('#mRev').textContent=mln(r.rev,2)+' млн ₽';
+  var md=$('#mDShare');md.textContent=sgn(r.dShare*100)+' п.п.';
+  md.className='mk-v num '+(r.dShare>=0?'pos':'neg');
+  var segs=[[r.share,'#FB4D5C','Мы'],[r.sA*100,'#FBBF24','A'],[r.sB*100,'#8B5CF6','B'],[r.sC*100,'#22D3EE','C'],[r.sO*100,'#8E6169','Прочие']];
+  $('#mStack').innerHTML=segs.map(function(s){return '<div class="st-seg" style="width:'+s[0]+'%;background:'+s[1]+'" title="'+s[2]+': '+fmt1(s[0])+'%"></div>';}).join('');
+  $('#mStackVal').textContent='мы '+fmt1(r.share)+'%';
+  var players=[
+    {n:'Мы · Автолига',c:'#FB4D5C',s:r.share,rev:r.rev,p:r.price,us:true},
+    {n:'A · АвтоПартс',c:'#FBBF24',s:r.sA*100,rev:r.revA,p:r.pA},
+    {n:'B · МоторЛайн',c:'#8B5CF6',s:r.sB*100,rev:r.revB,p:r.pB},
+    {n:'C · ТехноДрайв',c:'#22D3EE',s:r.sC*100,rev:r.revC,p:r.pC},
+    {n:'Прочие',c:'#8E6169',s:r.sO*100,rev:r.revO,p:r.pO}
+  ];
+  $('#mPlayers').innerHTML=players.map(function(p){
+    var rel=p.p/r.price;
+    return '<tr'+(p.us?' class="us"':'')+'><td><span class="sw"><i style="background:'+p.c+';color:'+p.c+'"></i>'+p.n+'</span></td>'+
+      '<td style="color:'+p.c+';font-weight:700">'+fmt1(p.s)+'</td><td>'+fmt(p.rev)+'</td><td>'+fmt(p.p)+'</td>'+
+      '<td class="'+(p.us?'':(rel>1.03?'warn':(rel<0.97?'pos':'mut')))+'" style="'+(p.us?'':'color:'+(rel>1.03?'#FBBF24':(rel<0.97?'#34D399':'#8E6169')))+'">'+(p.us?'—':fmt2(rel))+'</td></tr>';
+  }).join('');
+  $('#mFormula').innerHTML='индекс = '+fmt(r.price)+' ₽ / '+fmt(r.compAvg)+' ₽ = <span class="r">'+fmt2(r.idx)+'</span> · доля = '+fmt(r.rev)+' / '+fmt(r.market)+' = <span class="g">'+fmt1(r.share)+'%</span>';
+  $('#mParams').innerHTML=[
+    ['Шт',fmt(r.qty)],['Ср. цена',fmt(r.price)+' ₽'],['Δ выручки',sgn(r.growth*100)+'%'],
+    ['Прошлая доля',fmt1(r.prevShare*100)+'%'],['Рост рынка',sgn(r.marketGrowth*100)+'%'],
+    ['Топ-3 в бренде',fmt1((r.sA+r.sB+r.sC)*100)+'%']
+  ].map(function(p){return '<span class="mp">'+p[0]+' <b>'+p[1]+'</b></span>';}).join('');
+  $('#modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  $('#mClose').focus();
+}
+function closeModal(){
+  $('#modal').classList.remove('open');
+  document.body.style.overflow='';
+  modalRow=null;
+}
+function rowText(r){
+  return [
+    'АНАЛИЗ КОНКУРЕНТОВ · БРЕНД '+r.name+' · ДЕМО-ДАННЫЕ',
+    'Срез 13.09.2026 · неделя 07–13.09 против 31.08–06.09',
+    'Наша выручка '+fmt(r.rev)+' ₽ · '+fmt(r.qty)+' шт · ср. цена '+fmt(r.price)+' ₽',
+    'Рынок бренда '+fmt(r.market)+' ₽ · наша доля '+fmt1(r.share)+'% (было '+fmt1(r.prevShare*100)+'%)',
+    'Индекс цен '+fmt2(r.idx)+' (наша '+fmt(r.price)+' / конкуренты '+fmt(r.compAvg)+')',
+    'Δ выручки '+sgn(r.growth*100)+'% · Δ доли '+sgn(r.dShare*100)+' п.п.',
+    'Конкурент A '+fmt1(r.sA*100)+'% · B '+fmt1(r.sB*100)+'% · C '+fmt1(r.sC*100)+'% · прочие '+fmt1(r.sO*100)+'%',
+    'Рекомендация: '+REC[r.rec].label,
+    'Портфолио Шумелкин Е.А. · данные вымышленные'
+  ].join('\n');
+}
+
+/* ================= TOAST / COPY / CSV ================= */
+var toastT;
+function toast(msg){
+  var t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},2400);
+}
+function fallbackCopy(txt,done){
+  var ta=document.createElement('textarea');
+  ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done();}catch(e){toast('Не удалось скопировать');}
+  document.body.removeChild(ta);
+}
+function copyText(txt,ok){
+  function done(){toast(ok);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(function(){fallbackCopy(txt,done);});
+  }else fallbackCopy(txt,done);
+}
+function exportCsv(){
+  var arr=filtered();
+  var head=['Бренд','Наша выручка','Шт','Ср. цена','Рынок','Доля %','Индекс цен','Δ выручки %','Δ доли п.п.','Доля A %','Доля B %','Доля C %','Прочие %','Рекомендация'];
+  var lines=[head.join(';')];
+  var d=function(x){return String(x).replace('.',',');};
+  arr.forEach(function(r){
+    lines.push([r.name,R(r.rev),r.qty,R(r.price),R(r.market),d(fmt1(r.share)),d(fmt2(r.idx)),d(fmt1(r.growth*100)),d(fmt1(r.dShare*100)),
+      d(fmt1(r.sA*100)),d(fmt1(r.sB*100)),d(fmt1(r.sC*100)),d(fmt1(r.sO*100)),REC[r.rec].label].join(';'));
+  });
+  var blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='konkurenty-brendy-demo.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},800);
+  toast('CSV сохранён · '+arr.length+' брендов');
+}
+
+/* ================= ВКЛАДКИ ================= */
+var tabs=$$('.tab-btn'),panels=$$('.panel-tab');
+var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function activateTab(i){
+  tabs.forEach(function(t,j){
+    t.classList.toggle('active',j===i);
+    t.setAttribute('aria-selected',j===i?'true':'false');
+  });
+  panels.forEach(function(p,j){p.hidden=j!==i;});
+  var p=panels[i];
+  if(p){
+    requestAnimationFrame(function(){
+      Array.prototype.forEach.call(p.querySelectorAll('.rv'),function(el){el.classList.add('in');});
+    });
+  }
+  if(window.scrollY>240)window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
+}
+
+/* ================= ИНИЦИАЛИЗАЦИЯ ================= */
+function init(){
+  renderKPI();renderDonut();renderTopBrands();renderGauge();renderTrend();
+  renderCompKpis();renderStack();renderPlayers();renderBrandCards();renderTable();renderRec();
+
+  $('#fQ').addEventListener('input',function(e){state.q=e.target.value;renderTable();});
+  $('#fTrend').addEventListener('change',function(e){state.trend=e.target.value;renderTable();});
+  $('#fIdx').addEventListener('change',function(e){state.idx=e.target.value;renderTable();});
+  $('#fMoney').addEventListener('change',function(e){state.money=e.target.checked;renderTable();});
+  $('#fRisk').addEventListener('change',function(e){state.risk=e.target.checked;renderTable();});
+  $('#fSort').addEventListener('change',function(e){
+    var p=e.target.value.split(':');state.sort=p[0];state.dir=parseInt(p[1],10)||-1;renderTable();
+  });
+  $$('#fRec button').forEach(function(b){
+    b.addEventListener('click',function(){
+      state.rec=b.dataset.v;
+      $$('#fRec button').forEach(function(x){x.classList.toggle('on',x===b);});
+      renderTable();
+    });
+  });
+  $('#fReset').addEventListener('click',function(){
+    state.q='';state.rec='';state.trend='';state.idx='';state.money=false;state.risk=false;state.sort='rev';state.dir=-1;
+    $('#fQ').value='';$('#fTrend').value='';$('#fIdx').value='';$('#fMoney').checked=false;$('#fRisk').checked=false;
+    $$('#fRec button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='');});
+    renderTable();toast('Фильтры сброшены');
+  });
+  $('#brandTable').querySelector('thead').addEventListener('click',function(e){
+    var th=e.target.closest('th[data-k]');if(!th)return;
+    var k=th.dataset.k;
+    if(state.sort===k)state.dir=-state.dir;
+    else{state.sort=k;state.dir=(k==='name'||k==='dShare')?1:-1;}
+    renderTable();
+  });
+  $('#brandBody').addEventListener('click',function(e){
+    var tr=e.target.closest('tr[data-i]');if(tr)openModal(parseInt(tr.dataset.i,10));
+  });
+  $('#pgCsv').addEventListener('click',exportCsv);
+
+  $('#brandCards').addEventListener('click',function(e){
+    var c=e.target.closest('.bc[data-i]');if(c)openModal(parseInt(c.dataset.i,10));
+  });
+  $('#recGrid').addEventListener('click',function(e){
+    var li=e.target.closest('li[data-i]');if(li)openModal(parseInt(li.dataset.i,10));
+  });
+  $('#rQ').addEventListener('input',function(e){rState.q=e.target.value;renderRec();});
+  $$('#rGroup button').forEach(function(b){
+    b.addEventListener('click',function(){
+      rState.group=b.dataset.v;
+      $$('#rGroup button').forEach(function(x){x.classList.toggle('on',x===b);});
+      renderRec();
+    });
+  });
+  $('#rReset').addEventListener('click',function(){
+    rState.q='';rState.group='';
+    $('#rQ').value='';
+    $$('#rGroup button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='');});
+    renderRec();toast('Фильтры сброшены');
+  });
+
+  $('#mClose').addEventListener('click',closeModal);
+  $('#modalBg').addEventListener('click',closeModal);
+  $('#mCopy').addEventListener('click',function(){if(modalRow)copyText(rowText(modalRow),'Разбор бренда скопирован');});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&$('#modal').classList.contains('open'))closeModal();
+  });
+
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){activateTab(i);});});
+  document.querySelector('.tabs-in').addEventListener('keydown',function(e){
+    if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+    var cur=0;tabs.forEach(function(t,i){if(t.classList.contains('active'))cur=i;});
+    var next=(cur+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length;
+    activateTab(next);tabs[next].focus();e.preventDefault();
+  });
+
+  var header=$('#header'),aurora=$('#aurora'),ticking=false;
+  function onScroll(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var y=window.scrollY;
+      header.classList.toggle('scrolled',y>10);
+      if(!reduceMotion&&aurora)aurora.style.transform='translate3d(0,'+(y*0.06)+'px,0)';
+      ticking=false;
+    });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+    },{threshold:.1});
+    $$('.rv').forEach(function(el){io.observe(el);});
+  }else{$$('.rv').forEach(function(el){el.classList.add('in');});}
+
+  $('#year').textContent=String(new Date().getFullYear());
+  window.COMPETITORS={DATA:DATA,T:T,COUNT:COUNT};
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
 </script>
 </body>
 </html>
