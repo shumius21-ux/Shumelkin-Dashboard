@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  САЙТ-ПОРТФОЛИО · index.html · NEON (ревизия 4)
+  САЙТ-ПОРТФОЛИО · index.html · NEON (ревизия 5)
   Шумелкин Е.А. · аналитик-экономист · маркетплейсы
-  Добавлено: ссылка на аудит в шапке (первой) + блок аудита перед дашбордами
-  Аудит: Formaschool-Audit.html (лежит рядом на GitHub Pages)
+  Единообразное имя разбора: «Аудит бренда Formaschool на OZON»
 ============================================================ -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Шумелкин Е.А. — аналитик-экономист · живое портфолио · маркетплейсы</title>
-<meta name="description" content="Живое портфолио аналитика: аудит ассортимента Ozon по реальной выгрузке, юнит-экономика SKU, воронка продаж, анализ конкурентов. Интерактивные дашборды, калькулятор и Excel-модель — всё работает в браузере.">
+<meta name="description" content="Живое портфолио аналитика: аудит бренда Formaschool на OZON по реальной выгрузке, юнит-экономика SKU, воронка продаж, анализ конкурентов. Интерактивные дашборды, калькулятор и Excel-модель — всё работает в браузере.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233E8BFF'/%3E%3Cstop offset='1' stop-color='%23F0509E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%2305070D'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='32' font-weight='800' fill='url(%23g)' text-anchor='middle'%3E%D0%A8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,13 +77,14 @@ header.scrolled{box-shadow:0 10px 34px rgba(0,0,0,.55),0 1px 0 rgba(62,139,255,.
   display:grid;place-items:center;font:800 16px var(--disp);color:#fff;box-shadow:0 0 18px rgba(139,92,246,.5)}
 .brand-name{font-size:14px;font-weight:700;line-height:1.2;white-space:nowrap}
 .brand-role{font-size:10.5px;color:var(--dim);letter-spacing:.4px;white-space:nowrap}
-.nav-links{display:flex;gap:1px;margin-left:auto}
+.nav-links{display:flex;gap:1px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
 .nav-links a{position:relative;padding:8px 10px;font-size:13px;font-weight:600;color:var(--muted);border-radius:8px;transition:color .18s,background .18s;white-space:nowrap}
 .nav-links a:hover{color:var(--text);background:var(--surface2)}
 .nav-links a.active{color:var(--text)}
 .nav-links a.active::after{content:"";position:absolute;left:10px;right:10px;bottom:2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--magenta))}
-.nav-links a.nav-audit{display:inline-flex;align-items:center;gap:5px;color:var(--brass-soft);border:1px solid rgba(201,162,39,.32);background:rgba(201,162,39,.07);margin-right:5px}
-.nav-links a.nav-audit svg{width:11px;height:11px;opacity:.85}
+.nav-links a.nav-audit{display:inline-flex;align-items:center;gap:6px;color:var(--brass-soft);border:1px solid rgba(201,162,39,.32);background:rgba(201,162,39,.07);margin-right:5px}
+.nav-links a.nav-audit svg{width:11px;height:11px;opacity:.85;flex:none}
 .nav-links a.nav-audit:hover{color:var(--brass-hi);background:rgba(201,162,39,.14);border-color:rgba(201,162,39,.6)}
 .nav-links a.nav-audit.active{color:var(--brass-hi)}
 .nav-links a.nav-audit.active::after{background:linear-gradient(90deg,var(--sand),var(--brass),var(--amber))}
@@ -101,7 +101,7 @@ header.scrolled{box-shadow:0 10px 34px rgba(0,0,0,.55),0 1px 0 rgba(62,139,255,.
 .m-panel a{padding:11px 10px;font-size:15px;font-weight:600;color:var(--muted);border-radius:8px}
 .m-panel a:hover{background:var(--surface2);color:var(--text)}
 .m-panel a.m-audit{color:var(--brass-soft);border:1px solid rgba(201,162,39,.32);background:rgba(201,162,39,.07);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
-.m-panel a.m-audit svg{width:14px;height:14px}
+.m-panel a.m-audit svg{width:14px;height:14px;flex:none}
 .m-panel .nav-cta{margin:8px 0 0;text-align:center}
 
 /* ================= СЕКЦИИ ================= */
@@ -227,7 +227,7 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .how:hover{border-color:rgba(251,191,36,.5);transform:translateY(-3px)}
 .how-n{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:800 15px var(--disp);color:#fff;margin-bottom:11px;
   background:linear-gradient(135deg,var(--amber),var(--magenta));box-shadow:0 0 16px rgba(240,80,158,.4)}
-.how h4{font-size:14.5px;font-weight:700;margin-bottom:5px}
+.how h4{font-size:14px;font-weight:700;margin-bottom:5px;line-height:1.35}
 .how p{font-size:12.5px;color:var(--muted);line-height:1.6}
 .how p b{color:var(--cyan);font-weight:600}
 .gloss-t,.proof-t{font:600 10.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--amber);margin:26px 0 12px}
@@ -241,7 +241,7 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .pf b{display:block;font-size:12.5px;font-weight:700}
 .pf span{font-size:11.5px;color:var(--muted);line-height:1.5}
 
-/* ================= АУДИТ ШКОЛЬНОЙ ФОРМЫ ================= */
+/* ================= АУДИТ БРЕНДА FORMASCHOOL НА OZON ================= */
 #audit{padding:72px 0}
 .audit-card{position:relative;display:grid;grid-template-columns:1.02fr .98fr;gap:30px;align-items:center;
   background:linear-gradient(150deg,rgba(28,24,14,.82),rgba(14,19,32,.9));
@@ -533,8 +533,11 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 #toTop svg{width:17px;height:17px}
 
 /* ================= АДАПТИВ ================= */
+@media (max-width:1240px){
+  .nav-links a{padding:8px 8px;font-size:12px}
+  .nav-links a.nav-audit{font-size:11.5px}
+}
 @media (max-width:1180px){
-  .nav-links a{padding:8px 8px;font-size:12.5px}
   .brand-role{display:none}
 }
 @media (max-width:1080px){
@@ -610,7 +613,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
       <span><span class="brand-name">Шумелкин Е.А.</span><br><span class="brand-role">аналитик-экономист · маркетплейсы</span></span>
     </a>
     <nav class="nav-links" aria-label="Разделы">
-      <a class="nav-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener" data-spy="audit">Аудит формы
+      <a class="nav-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener" data-spy="audit">Аудит бренда Formaschool на OZON
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
       <a href="#dashboards" data-spy="dashboards">Дашборды</a>
       <a href="#calculator" data-spy="calculator">Калькулятор</a>
@@ -624,10 +627,10 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
   </div>
 </header>
 <div class="m-panel" id="mPanel">
-  <a class="m-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener">Аудит школьной формы · Ozon
+  <a class="m-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener">Аудит бренда Formaschool на OZON
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
   <a href="#start">Что это за сайт</a>
-  <a href="#audit">Аудит формы · кратко</a>
+  <a href="#audit">Аудит бренда Formaschool на OZON · кратко</a>
   <a href="#dashboards">Дашборды</a>
   <a href="#calculator">Калькулятор</a>
   <a href="#value">Польза для бизнеса</a>
@@ -659,7 +662,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <a class="btn btn-x" href="Excel.html" target="_blank" rel="noopener">Excel-модель · .xlsx
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></a>
       </div>
-      <p class="hero-note">Три дашборда работают на демонстрационных данных. <a href="#audit" style="color:var(--brass-soft)">Аудит школьной формы</a> — на открытой выгрузке аналитики Ozon по реальному бренду. Впервые здесь? <a href="#start">Объясняю простыми словами за 30 секунд ↓</a></p>
+      <p class="hero-note">Три дашборда работают на демонстрационных данных. <a href="#audit" style="color:var(--brass-soft)">Аудит бренда Formaschool на OZON</a> — на открытой выгрузке аналитики площадки, без доступа к чужому кабинету. Впервые здесь? <a href="#start">Объясняю простыми словами за 30 секунд ↓</a></p>
     </div>
 
     <!-- Демо-панель -->
@@ -720,7 +723,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tickerTrack">
     <div class="tk-group">
-      <span class="tk">АУДИТ OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
+      <span class="tk">АУДИТ БРЕНДА FORMASCHOOL НА OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
       <span class="tk">УПУЩЕНО ПО АУДИТУ <b class="au">2,28 МЛН ₽</b><span class="sep">◆</span></span>
       <span class="tk">МАРЖА ДЕМО-СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
       <span class="tk">УБЫТОЧНЫХ SKU <b class="dn">174</b><span class="sep">◆</span></span>
@@ -732,7 +735,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
       <span class="tk">ABC: A <b>78%</b> · B <b>17%</b> · C <b>5%</b><span class="sep">◆</span></span>
     </div>
     <div class="tk-group">
-      <span class="tk">АУДИТ OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
+      <span class="tk">АУДИТ БРЕНДА FORMASCHOOL НА OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
       <span class="tk">УПУЩЕНО ПО АУДИТУ <b class="au">2,28 МЛН ₽</b><span class="sep">◆</span></span>
       <span class="tk">МАРЖА ДЕМО-СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
       <span class="tk">УБЫТОЧНЫХ SKU <b class="dn">174</b><span class="sep">◆</span></span>
@@ -752,10 +755,10 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
     <div class="start-panel rv">
       <div class="eyebrow">Для HR и руководителей · 30 секунд</div>
       <h2>Что это за сайт — простыми словами</h2>
-      <p class="start-lead">Обычно аналитики показывают в портфолио скриншоты таблиц, и понять уровень специалиста сложно. <b>Здесь всё можно потрогать:</b> аудит реального ассортимента по открытой выгрузке Ozon, три работающих демо-дашборда и калькулятор. Откройте, покрутите фильтры, посмотрите выводы — и вы сразу увидите, как человек думает и работает, а не будете верить на слово.</p>
+      <p class="start-lead">Обычно аналитики показывают в портфолио скриншоты таблиц, и понять уровень специалиста сложно. <b>Здесь всё можно потрогать:</b> аудит бренда Formaschool на OZON по открытой выгрузке площадки, три работающих демо-дашборда и калькулятор. Откройте, покрутите фильтры, посмотрите выводы — и вы сразу увидите, как человек думает и работает, а не будете верить на слово.</p>
 
       <div class="how-grid">
-        <div class="how"><div class="how-n">1</div><h4>Начните с аудита формы</h4><p>Единственный разбор на <b>реальных данных</b>: 434 карточки Ozon, упущенная выручка в трёх оценках, вывод по каждому SKU и переход на карточку товара.</p></div>
+        <div class="how"><div class="how-n">1</div><h4>Аудит бренда Formaschool на OZON</h4><p>Единственный разбор на <b>реальных данных</b>: 434 карточки, упущенная выручка в трёх оценках, вывод по каждому SKU и переход на карточку товара.</p></div>
         <div class="how"><div class="how-n">2</div><h4>Откройте любой дашборд</h4><p>Ниже три карточки: «Воронка продаж», «Юнит-экономика», «Анализ конкурентов». Жмите <b>«Открыть дашборд»</b> — отчёт откроется в новой вкладке.</p></div>
         <div class="how"><div class="how-n">3</div><h4>Покрутите фильтры и расчёт</h4><p>Меняйте период, площадку, параметры SKU — цифры пересчитываются мгновенно, система сама пишет <b>вердикт: снизить цену, удержать, вывести.</b></p></div>
       </div>
@@ -781,20 +784,20 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
   </div>
 </section>
 
-<!-- ================= АУДИТ ШКОЛЬНОЙ ФОРМЫ ================= -->
+<!-- ================= АУДИТ БРЕНДА FORMASCHOOL НА OZON ================= -->
 <section id="audit">
   <div class="wrap">
     <div class="sec-head rv">
       <div class="eyebrow">Разбор по реальной выгрузке · Ozon</div>
-      <h2>Аудит ассортимента школьной формы</h2>
-      <p class="sec-sub">Единственный материал портфолио на реальных данных: открытая выгрузка аналитики из личного кабинета Ozon по бренду школьной формы. Срез 19.11.2026, окно 28 дней, 434 карточки, 24 модели. Показывает, что можно вытащить из чужого ассортимента снаружи — без доступа к кабинету компании.</p>
+      <h2>Аудит бренда Formaschool на OZON</h2>
+      <p class="sec-sub">Единственный материал портфолио на реальных данных: открытая выгрузка аналитики из личного кабинета Ozon по бренду Formaschool. Срез 19.11.2026, окно 28 дней, 434 карточки, 24 модели. Показывает, что можно вытащить из чужого ассортимента снаружи — без доступа к кабинету компании.</p>
     </div>
 
     <a class="audit-card rv" href="Formaschool-Audit.html" target="_blank" rel="noopener">
       <div>
         <div class="audit-top">
           <span class="audit-badge">РЕАЛЬНАЯ ВЫГРУЗКА</span>
-          <span class="audit-src">Ozon · FORMASCHOOL · 28 дней</span>
+          <span class="audit-src">OZON · FORMASCHOOL · 28 ДНЕЙ</span>
         </div>
         <h3>Где бренд теряет деньги: склад, реклама, календарь запусков</h3>
         <p class="audit-desc">Основной источник потерь — <b>отсутствие товара при живом спросе</b>, а не цена и не реклама. Колонка упущенной выручки площадки даёт 1,15 млн ₽, но 70 карточек имеют дни без стока и нулевую оценку: с поправкой величина вырастает до <b>2,28 млн ₽</b>, верхняя граница — 2,94 млн ₽. Все три сценария переключаются, цифры и графики пересчитываются.</p>
@@ -814,7 +817,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         </ul>
 
         <div class="audit-cta">
-          <span class="audit-btn">Открыть аудит
+          <span class="audit-btn">Открыть аудит бренда Formaschool на OZON
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
           <span class="audit-hint">новая вкладка · 434 SKU в интерактиве</span>
         </div>
@@ -847,7 +850,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
             <span class="mb-track"><span class="mb-fill" style="width:62.2%"></span></span>
           </div>
         </div>
-        <p class="av-note">Фрагмент реального блока из аудита. Внутри — топ-10, полная таблица по 434 карточкам и разбор каждой позиции.</p>
+        <p class="av-note">Фрагмент реального блока из аудита бренда Formaschool на OZON. Внутри — топ-10, полная таблица по 434 карточкам и разбор каждой позиции.</p>
       </div>
     </a>
   </div>
@@ -1126,7 +1129,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <div class="ben rv" style="--bc:var(--amber);--bg-glow:rgba(251,191,36,.1);transition-delay:.25s">
           <div class="ben-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
           <h4>Демо наружу, данные внутри</h4>
-          <p>Публичные дашборды — на вымышленных данных. <b>Боевые цифры остаются в компании.</b> Аудит формы сделан по открытой выгрузке площадки, без доступа к чужому кабинету.</p>
+          <p>Публичные дашборды — на вымышленных данных. <b>Боевые цифры остаются в компании.</b> Аудит бренда Formaschool на OZON сделан по открытой выгрузке площадки, без доступа к чужому кабинету.</p>
         </div>
       </div>
     </div>
@@ -1168,7 +1171,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
     <div class="principles">
       <div class="pr rv"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><div><h5>Проверяемость</h5><p>Любая цифра на дашборде раскладывается до формулы и исходной строки выгрузки.</p></div></div>
       <div class="pr rv" style="transition-delay:.06s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15l3 3-3 3"/></svg></span><div><h5>Отчёт заканчивается решением</h5><p>На выходе — список действий по цене, закупу и ассортименту с приоритетами.</p></div></div>
-      <div class="pr rv" style="transition-delay:.12s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><h5>Демо и рабочие данные</h5><p>Дашборды — на вымышленных данных, аудит — на открытой выгрузке площадки. Коммерческие показатели компаний не раскрываются.</p></div></div>
+      <div class="pr rv" style="transition-delay:.12s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><h5>Демо и рабочие данные</h5><p>Дашборды — на вымышленных данных, аудит бренда Formaschool на OZON — на открытой выгрузке площадки. Коммерческие показатели компаний не раскрываются.</p></div></div>
     </div>
   </div>
 </section>
@@ -1249,7 +1252,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 <footer>
   <div class="wrap foot">
     <span>© <span id="year">2026</span> Шумелкин Е.А. · Портфолио собрано вручную: HTML / CSS / JS</span>
-    <span>Дашборды — демо-данные · <a href="Formaschool-Audit.html" target="_blank" rel="noopener">аудит формы</a> — открытая выгрузка Ozon · <a href="Excel.html" target="_blank" rel="noopener">Excel-модель .xlsx</a> · <a href="#hero">Наверх ↑</a></span>
+    <span>Дашборды — демо-данные · <a href="Formaschool-Audit.html" target="_blank" rel="noopener">Аудит бренда Formaschool на OZON</a> — открытая выгрузка площадки · <a href="Excel.html" target="_blank" rel="noopener">Excel-модель .xlsx</a> · <a href="#hero">Наверх ↑</a></span>
   </div>
 </footer>
 
