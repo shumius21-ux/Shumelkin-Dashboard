@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <!-- ============================================================
-  САЙТ-ПОРТФОЛИО · index.html · NEON-версия (ревизия 3)
+  САЙТ-ПОРТФОЛИО · index.html · NEON (ревизия 4)
   Шумелкин Е.А. · аналитик-экономист · маркетплейсы
-  Правки: CTA «Попробовать рассчитать Юнит-экономику», контакт MAX,
-  «Мой опыт и инструменты», «Сейчас я… 12 000+ SKU в ассортименте»,
-  крупный баннер «Открыт к предложениям» + ФИО.
+  Добавлено: ссылка на аудит в шапке (первой) + блок аудита перед дашбордами
+  Аудит: Formaschool-Audit.html (лежит рядом на GitHub Pages)
 ============================================================ -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Шумелкин Е.А. — аналитик-экономист · живое портфолио · маркетплейсы</title>
-<meta name="description" content="Живое портфолио аналитика: юнит-экономика SKU, воронка продаж, анализ конкурентов. Ozon, Wildberries, Яндекс Маркет. Интерактивные дашборды, калькулятор и Excel-модель — всё работает в браузере.">
+<meta name="description" content="Живое портфолио аналитика: аудит ассортимента Ozon по реальной выгрузке, юнит-экономика SKU, воронка продаж, анализ конкурентов. Интерактивные дашборды, калькулятор и Excel-модель — всё работает в браузере.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233E8BFF'/%3E%3Cstop offset='1' stop-color='%23F0509E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%2305070D'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='url(%23g)' stroke-width='2.5'/%3E%3Ctext x='32' y='44' font-family='Arial' font-size='32' font-weight='800' fill='url(%23g)' text-anchor='middle'%3E%D0%A8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,11 +20,12 @@
 :root{
   --bg:#05070D; --bg2:#090C15;
   --surface:#0E1320; --surface2:#141A2B;
-  --line:#1E2740; --line2:#2B3757;
+  --line:#1E2740; --line2:#2E3A50;
   --text:#EDF1FA; --muted:#9AA7C0; --dim:#67748F;
   --blue:#3E8BFF; --cyan:#22D3EE; --violet:#8B5CF6; --magenta:#F0509E;
   --lime:#A3E635; --green:#34D399; --red:#FB7185; --amber:#FBBF24;
   --teal:#2DD4BF; --orange:#FB923C; --steel:#7A8AA6; --slate:#566178;
+  --brass:#C9A227; --brass-soft:#D9BC5E; --brass-hi:#F0D48A; --sand:#C2A878;
   --blue-t:rgba(62,139,255,.10); --cyan-t:rgba(34,211,238,.10);
   --disp:'Unbounded','Inter',-apple-system,'Segoe UI',sans-serif;
   --sans:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
@@ -69,21 +69,26 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 
 /* ================= ШАПКА ================= */
 header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--head-h);
-  background:rgba(5,7,13,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(5,7,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);transition:box-shadow .25s}
 header.scrolled{box-shadow:0 10px 34px rgba(0,0,0,.55),0 1px 0 rgba(62,139,255,.25)}
-.nav-in{height:var(--head-h);display:flex;align-items:center;gap:16px}
-.brand{display:flex;align-items:center;gap:11px;color:var(--text)}
+.nav-in{height:var(--head-h);display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:11px;color:var(--text);flex:none}
 .brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--violet) 55%,var(--magenta));
   display:grid;place-items:center;font:800 16px var(--disp);color:#fff;box-shadow:0 0 18px rgba(139,92,246,.5)}
-.brand-name{font-size:14px;font-weight:700;line-height:1.2}
-.brand-role{font-size:10.5px;color:var(--dim);letter-spacing:.4px}
-.nav-links{display:flex;gap:2px;margin-left:auto}
-.nav-links a{position:relative;padding:8px 11px;font-size:13px;font-weight:600;color:var(--muted);border-radius:8px;transition:color .18s,background .18s}
+.brand-name{font-size:14px;font-weight:700;line-height:1.2;white-space:nowrap}
+.brand-role{font-size:10.5px;color:var(--dim);letter-spacing:.4px;white-space:nowrap}
+.nav-links{display:flex;gap:1px;margin-left:auto}
+.nav-links a{position:relative;padding:8px 10px;font-size:13px;font-weight:600;color:var(--muted);border-radius:8px;transition:color .18s,background .18s;white-space:nowrap}
 .nav-links a:hover{color:var(--text);background:var(--surface2)}
 .nav-links a.active{color:var(--text)}
-.nav-links a.active::after{content:"";position:absolute;left:11px;right:11px;bottom:2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--magenta))}
-.nav-cta{margin-left:6px;padding:9px 17px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;
+.nav-links a.active::after{content:"";position:absolute;left:10px;right:10px;bottom:2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--magenta))}
+.nav-links a.nav-audit{display:inline-flex;align-items:center;gap:5px;color:var(--brass-soft);border:1px solid rgba(201,162,39,.32);background:rgba(201,162,39,.07);margin-right:5px}
+.nav-links a.nav-audit svg{width:11px;height:11px;opacity:.85}
+.nav-links a.nav-audit:hover{color:var(--brass-hi);background:rgba(201,162,39,.14);border-color:rgba(201,162,39,.6)}
+.nav-links a.nav-audit.active{color:var(--brass-hi)}
+.nav-links a.nav-audit.active::after{background:linear-gradient(90deg,var(--sand),var(--brass),var(--amber))}
+.nav-cta{margin-left:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;flex:none;
   background:linear-gradient(135deg,var(--blue),var(--violet));box-shadow:0 4px 18px rgba(62,139,255,.35);transition:transform .15s,box-shadow .15s}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(139,92,246,.5)}
 .burger{display:none;width:38px;height:38px;border:1px solid var(--line2);border-radius:9px;position:relative;margin-left:auto}
@@ -95,20 +100,23 @@ header.scrolled{box-shadow:0 10px 34px rgba(0,0,0,.55),0 1px 0 rgba(62,139,255,.
 .m-panel.open{display:flex}
 .m-panel a{padding:11px 10px;font-size:15px;font-weight:600;color:var(--muted);border-radius:8px}
 .m-panel a:hover{background:var(--surface2);color:var(--text)}
+.m-panel a.m-audit{color:var(--brass-soft);border:1px solid rgba(201,162,39,.32);background:rgba(201,162,39,.07);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.m-panel a.m-audit svg{width:14px;height:14px}
 .m-panel .nav-cta{margin:8px 0 0;text-align:center}
 
 /* ================= СЕКЦИИ ================= */
-section{padding:90px 0;scroll-margin-top:calc(var(--head-h) + 18px);position:relative;--acc:var(--blue);--acc-glow:rgba(62,139,255,.08)}
+section{padding:88px 0;scroll-margin-top:calc(var(--head-h) + 18px);position:relative;--acc:var(--blue);--acc-glow:rgba(62,139,255,.08)}
 section::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(640px 320px at 88% 0%,var(--acc-glow),transparent 65%)}
 #start{--acc:var(--amber);--acc-glow:rgba(251,191,36,.07)}
+#audit{--acc:var(--brass);--acc-glow:rgba(201,162,39,.10)}
 #dashboards{--acc:var(--blue);--acc-glow:rgba(62,139,255,.09)}
 #calculator{--acc:var(--green);--acc-glow:rgba(52,211,153,.07)}
 #value{--acc:var(--magenta);--acc-glow:rgba(240,80,158,.08)}
 #workflow{--acc:var(--teal);--acc-glow:rgba(45,212,191,.07)}
 #about{--acc:var(--violet);--acc-glow:rgba(139,92,246,.08)}
 #contact{--acc:var(--cyan);--acc-glow:rgba(34,211,238,.08)}
-.sec-head{margin-bottom:34px;max-width:780px;position:relative}
-.eyebrow{font:600 11px var(--mono);letter-spacing:1.8px;color:var(--acc);text-transform:uppercase;margin-bottom:12px}
+.sec-head{margin-bottom:34px;max-width:800px;position:relative}
+.eyebrow{font:600 11px var(--mono);letter-spacing:1.6px;color:var(--acc);text-transform:uppercase;margin-bottom:12px}
 h2{font:700 clamp(21px,2.6vw,29px)/1.3 var(--disp);letter-spacing:-.2px}
 .sec-sub{margin-top:12px;color:var(--muted);font-size:14.5px}
 .rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
@@ -137,7 +145,7 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .btn-g:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 22px rgba(34,211,238,.25)}
 .btn-x{color:var(--teal);border:1px solid rgba(45,212,191,.5);background:rgba(45,212,191,.07)}
 .btn-x:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(45,212,191,.35)}
-.hero-note{margin-top:18px;font-size:12px;color:var(--dim);max-width:540px}
+.hero-note{margin-top:18px;font-size:12px;color:var(--dim);max-width:560px}
 
 /* демо-панель */
 .demo-panel{background:rgba(14,19,32,.92);border:1px solid rgba(62,139,255,.4);border-radius:18px;overflow:hidden;
@@ -175,7 +183,7 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .vrow{display:flex;align-items:center;gap:9px;margin:6px 0}
 .vlabel{width:118px;flex:none;font-size:11.5px;color:var(--muted)}
 .vbar{flex:1;height:8px;background:var(--bg2);border:1px solid var(--line);border-radius:5px;overflow:hidden}
-.vfill{height:100%;border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px currentColor}
+.vfill{display:block;height:100%;border-radius:4px;transition:width .5s ease;box-shadow:0 0 8px currentColor}
 .vval{width:82px;flex:none;text-align:right;font:500 11.5px var(--mono);color:var(--text)}
 .vconv{width:52px;flex:none;text-align:right;font:500 10.5px var(--mono);color:var(--dim)}
 .vhead{display:flex;gap:9px;margin-bottom:2px}
@@ -204,14 +212,15 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .tk{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;font:600 11.5px var(--mono);letter-spacing:1px;color:var(--muted);white-space:nowrap}
 .tk b{color:var(--cyan);font-weight:600}
 .tk .up{color:var(--green)}.tk .dn{color:var(--red)}.tk .wr{color:var(--amber)}
+.tk .au{color:var(--brass-soft)}
 .tk .sep{color:var(--magenta);text-shadow:0 0 8px rgba(240,80,158,.6)}
 
-/* ================= ПРОСТЫМИ СЛОВАМИ ================= */
+/* ================= БЛОК «ПРОСТЫМИ СЛОВАМИ» ================= */
 #start{padding:64px 0}
 .start-panel{position:relative;border:1px solid rgba(251,191,36,.35);border-radius:22px;padding:30px;overflow:hidden;
   background:linear-gradient(155deg,rgba(251,191,36,.06),rgba(240,80,158,.05) 55%,rgba(62,139,255,.05))}
 .start-panel::before{content:"";position:absolute;top:-70px;right:-70px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.16),transparent 65%);pointer-events:none}
-.start-lead{color:var(--muted);font-size:15px;max-width:860px;margin-top:12px}
+.start-lead{color:var(--muted);font-size:15px;max-width:880px;margin-top:12px}
 .start-lead b{color:var(--text)}
 .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
 .how{background:rgba(9,12,21,.75);border:1px solid var(--line);border-radius:14px;padding:18px;transition:border-color .2s,transform .2s}
@@ -231,6 +240,52 @@ h1{font:800 clamp(28px,4vw,44px)/1.14 var(--disp);letter-spacing:-.5px;margin:12
 .pf svg{width:17px;height:17px;flex:none;margin-top:2px;color:var(--lime);filter:drop-shadow(0 0 6px rgba(163,230,53,.5))}
 .pf b{display:block;font-size:12.5px;font-weight:700}
 .pf span{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+/* ================= АУДИТ ШКОЛЬНОЙ ФОРМЫ ================= */
+#audit{padding:72px 0}
+.audit-card{position:relative;display:grid;grid-template-columns:1.02fr .98fr;gap:30px;align-items:center;
+  background:linear-gradient(150deg,rgba(28,24,14,.82),rgba(14,19,32,.9));
+  border:1px solid rgba(201,162,39,.42);border-radius:20px;padding:28px;color:var(--text);overflow:hidden;
+  transition:border-color .2s,transform .2s,box-shadow .2s;--mx:50%;--my:50%}
+.audit-card::before{content:"";position:absolute;inset:0;background:radial-gradient(340px circle at var(--mx) var(--my),rgba(201,162,39,.14),transparent 62%);opacity:0;transition:opacity .25s;pointer-events:none}
+.audit-card::after{content:"";position:absolute;top:0;left:28px;right:28px;height:1px;background:linear-gradient(90deg,transparent,var(--sand),var(--brass),var(--amber),transparent);opacity:.85}
+.audit-card:hover{border-color:var(--brass);transform:translateY(-3px);box-shadow:0 20px 52px rgba(0,0,0,.5),0 0 38px rgba(201,162,39,.22)}
+.audit-card:hover::before{opacity:1}
+.audit-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.audit-badge{font:600 10px var(--mono);letter-spacing:1.3px;color:#0F1216;background:linear-gradient(135deg,var(--sand),var(--brass));padding:5px 10px;border-radius:6px;box-shadow:0 0 16px rgba(201,162,39,.35)}
+.audit-src{font:500 10.5px var(--mono);color:var(--brass-soft);border:1px solid rgba(201,162,39,.35);border-radius:6px;padding:4px 9px}
+.audit-card h3{font:700 clamp(17px,2vw,21px)/1.3 var(--disp);letter-spacing:-.2px;margin-bottom:10px}
+.audit-desc{font-size:13.5px;color:var(--muted);line-height:1.65}
+.audit-desc b{color:var(--text);font-weight:600}
+.audit-kpis{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0}
+.ak{font:500 11.5px var(--mono);border:1px solid rgba(201,162,39,.32);border-radius:6px;padding:5px 10px;color:var(--muted);background:rgba(201,162,39,.06)}
+.ak b{color:var(--brass-hi);font-weight:700}
+.audit-list{list-style:none;margin:14px 0 18px}
+.audit-list li{display:flex;gap:9px;font-size:12.5px;color:var(--muted);padding:4px 0;line-height:1.55}
+.audit-list svg{width:13px;height:13px;flex:none;margin-top:3px;color:var(--brass)}
+.audit-list b{color:var(--text);font-weight:600}
+.audit-cta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:16px;border-top:1px solid rgba(201,162,39,.22)}
+.audit-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:11px;font-size:13.5px;font-weight:700;color:#12100A;
+  background:linear-gradient(135deg,var(--sand),var(--brass) 60%,var(--amber));box-shadow:0 8px 24px rgba(201,162,39,.28);transition:.18s}
+.audit-card:hover .audit-btn{box-shadow:0 12px 32px rgba(201,162,39,.42)}
+.audit-btn svg{width:15px;height:15px;transition:transform .18s}
+.audit-card:hover .audit-btn svg{transform:translate(2px,-2px)}
+.audit-hint{font-size:10.5px;color:var(--dim);font-family:var(--mono)}
+.audit-visual{background:rgba(6,8,13,.55);border:1px solid rgba(201,162,39,.2);border-radius:14px;padding:18px}
+.av-t{font:600 10px var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--brass);margin-bottom:12px}
+.est-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.et{background:rgba(10,13,20,.75);border:1px solid var(--line2);border-radius:9px;padding:10px 11px}
+.et-l{font:600 9px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
+.et-v{font:800 16px var(--mono);margin-top:4px;color:var(--ec);text-shadow:0 0 14px var(--eg)}
+.et-s{font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.35}
+.mini-bars{display:grid;gap:9px}
+.mb-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.mb-l{font-size:11.5px;color:var(--muted);line-height:1.3}
+.mb-l small{display:block;font:400 9.5px var(--mono);color:var(--dim);margin-top:1px}
+.mb-v{font:700 11.5px var(--mono);color:var(--brass-soft);white-space:nowrap}
+.mb-track{display:block;height:9px;background:rgba(10,13,20,.8);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.mb-fill{display:block;height:100%;background:repeating-linear-gradient(115deg,var(--brass) 0 7px,rgba(201,162,39,.72) 7px 14px);transition:width .6s ease}
+.av-note{font-size:10.5px;color:var(--dim);margin-top:12px;line-height:1.5}
 
 /* ================= КОНТУР + КАРТОЧКИ ================= */
 .loop{display:flex;align-items:stretch;margin-bottom:26px;position:relative}
@@ -478,6 +533,10 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 #toTop svg{width:17px;height:17px}
 
 /* ================= АДАПТИВ ================= */
+@media (max-width:1180px){
+  .nav-links a{padding:8px 8px;font-size:12.5px}
+  .brand-role{display:none}
+}
 @media (max-width:1080px){
   .cards{grid-template-columns:1fr 1fr}
   .cards .card:last-child{grid-column:1/-1}
@@ -487,10 +546,12 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
   .value-grid{grid-template-columns:1fr}
   .value-left{position:static}
   .contact-grid{grid-template-columns:1fr 1fr}
+  .audit-card{grid-template-columns:1fr;gap:22px}
 }
-@media (max-width:920px){
+@media (max-width:980px){
   .nav-links,.nav-cta.desk{display:none}
   .burger{display:block}
+  .brand-role{display:block}
   .hero-grid{grid-template-columns:1fr;gap:36px}
   .calc-grid{grid-template-columns:1fr}
   .calc-left{position:static}
@@ -518,6 +579,8 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
   .gloss{grid-template-columns:1fr}
   .proof{grid-template-columns:1fr}
   .avail-banner{padding:18px}
+  .audit-card{padding:20px 18px}
+  .est-tiles{grid-template-columns:1fr}
 }
 @media (max-width:420px){
   .steps{grid-template-columns:1fr}
@@ -533,7 +596,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 </style>
 </head>
 <body>
-<noscript><div class="ns">Интерактивные блоки (демо-панель, калькулятор) требуют JavaScript. Дашборды по ссылкам ниже открываются независимо.</div></noscript>
+<noscript><div class="ns">Интерактивные блоки (демо-панель, калькулятор) требуют JavaScript. Дашборды и аудит по ссылкам открываются независимо.</div></noscript>
 
 <div class="aurora" id="aurora" aria-hidden="true">
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
@@ -547,6 +610,8 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
       <span><span class="brand-name">Шумелкин Е.А.</span><br><span class="brand-role">аналитик-экономист · маркетплейсы</span></span>
     </a>
     <nav class="nav-links" aria-label="Разделы">
+      <a class="nav-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener" data-spy="audit">Аудит формы
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
       <a href="#dashboards" data-spy="dashboards">Дашборды</a>
       <a href="#calculator" data-spy="calculator">Калькулятор</a>
       <a href="#value" data-spy="value">Польза для бизнеса</a>
@@ -559,7 +624,10 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
   </div>
 </header>
 <div class="m-panel" id="mPanel">
+  <a class="m-audit" href="Formaschool-Audit.html" target="_blank" rel="noopener">Аудит школьной формы · Ozon
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
   <a href="#start">Что это за сайт</a>
+  <a href="#audit">Аудит формы · кратко</a>
   <a href="#dashboards">Дашборды</a>
   <a href="#calculator">Калькулятор</a>
   <a href="#value">Польза для бизнеса</a>
@@ -591,7 +659,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <a class="btn btn-x" href="Excel.html" target="_blank" rel="noopener">Excel-модель · .xlsx
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></a>
       </div>
-      <p class="hero-note">Публичная версия работает на демонстрационных данных. Структура отчётов и логика расчётов — как в рабочем контуре. Впервые здесь? <a href="#start">Объясняю простыми словами за 30 секунд ↓</a></p>
+      <p class="hero-note">Три дашборда работают на демонстрационных данных. <a href="#audit" style="color:var(--brass-soft)">Аудит школьной формы</a> — на открытой выгрузке аналитики Ozon по реальному бренду. Впервые здесь? <a href="#start">Объясняю простыми словами за 30 секунд ↓</a></p>
     </div>
 
     <!-- Демо-панель -->
@@ -604,9 +672,9 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <span class="badge-demo">ДЕМО-ДАННЫЕ</span>
       </div>
       <div class="demo-tabs" role="tablist" aria-label="Отчёты">
-        <button class="demo-tab active" role="tab" aria-selected="true" data-tab="0" data-href="Воронка.html" data-title="Воронка продаж">Воронка</button>
-        <button class="demo-tab" role="tab" aria-selected="false" data-tab="1" data-href="Юнит-экономика.html" data-title="Юнит-экономика">Юнит-экономика</button>
-        <button class="demo-tab" role="tab" aria-selected="false" data-tab="2" data-href="Анализ%20конкурентов.html" data-title="Анализ конкурентов">Конкуренты</button>
+        <button class="demo-tab active" role="tab" aria-selected="true" data-tab="0" data-href="Воронка.html" data-title="Воронка продаж" type="button">Воронка</button>
+        <button class="demo-tab" role="tab" aria-selected="false" data-tab="1" data-href="Юнит-экономика.html" data-title="Юнит-экономика" type="button">Юнит-экономика</button>
+        <button class="demo-tab" role="tab" aria-selected="false" data-tab="2" data-href="Анализ%20конкурентов.html" data-title="Анализ конкурентов" type="button">Конкуренты</button>
       </div>
 
       <div class="demo-body" data-panel="0" role="tabpanel">
@@ -652,27 +720,27 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tickerTrack">
     <div class="tk-group">
-      <span class="tk">МАРЖА СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
+      <span class="tk">АУДИТ OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
+      <span class="tk">УПУЩЕНО ПО АУДИТУ <b class="au">2,28 МЛН ₽</b><span class="sep">◆</span></span>
+      <span class="tk">МАРЖА ДЕМО-СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
       <span class="tk">УБЫТОЧНЫХ SKU <b class="dn">174</b><span class="sep">◆</span></span>
       <span class="tk">ДРР <b class="wr">9,2%</b><span class="sep">◆</span></span>
       <span class="tk">ИНДЕКС ЦЕН <b>0,94</b><span class="sep">◆</span></span>
       <span class="tk">ВИЗИТ → ЗАКАЗ <b>3,7%</b><span class="sep">◆</span></span>
-      <span class="tk">УПУЩЕНО <b class="wr">≈1,2 МЛН ₽</b><span class="sep">◆</span></span>
       <span class="tk">900 SKU · FBO / FBS<span class="sep">◆</span></span>
       <span class="tk">P&amp;L = ЦЕНА − ЗАКУП − КОМИССИЯ − ЛОГИСТИКА − ДРР − ВОЗВРАТЫ − НАЛОГ<span class="sep">◆</span></span>
-      <span class="tk">=СУММЕСЛИМН(Продажи[Выручка];Продажи[SKU];A2)<span class="sep">◆</span></span>
       <span class="tk">ABC: A <b>78%</b> · B <b>17%</b> · C <b>5%</b><span class="sep">◆</span></span>
     </div>
     <div class="tk-group">
-      <span class="tk">МАРЖА СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
+      <span class="tk">АУДИТ OZON · <b class="au">434 КАРТОЧКИ</b> · РЕАЛЬНАЯ ВЫГРУЗКА<span class="sep">◆</span></span>
+      <span class="tk">УПУЩЕНО ПО АУДИТУ <b class="au">2,28 МЛН ₽</b><span class="sep">◆</span></span>
+      <span class="tk">МАРЖА ДЕМО-СРЕЗА <b class="up">18,4%</b><span class="sep">◆</span></span>
       <span class="tk">УБЫТОЧНЫХ SKU <b class="dn">174</b><span class="sep">◆</span></span>
       <span class="tk">ДРР <b class="wr">9,2%</b><span class="sep">◆</span></span>
       <span class="tk">ИНДЕКС ЦЕН <b>0,94</b><span class="sep">◆</span></span>
       <span class="tk">ВИЗИТ → ЗАКАЗ <b>3,7%</b><span class="sep">◆</span></span>
-      <span class="tk">УПУЩЕНО <b class="wr">≈1,2 МЛН ₽</b><span class="sep">◆</span></span>
       <span class="tk">900 SKU · FBO / FBS<span class="sep">◆</span></span>
       <span class="tk">P&amp;L = ЦЕНА − ЗАКУП − КОМИССИЯ − ЛОГИСТИКА − ДРР − ВОЗВРАТЫ − НАЛОГ<span class="sep">◆</span></span>
-      <span class="tk">=СУММЕСЛИМН(Продажи[Выручка];Продажи[SKU];A2)<span class="sep">◆</span></span>
       <span class="tk">ABC: A <b>78%</b> · B <b>17%</b> · C <b>5%</b><span class="sep">◆</span></span>
     </div>
   </div>
@@ -684,12 +752,12 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
     <div class="start-panel rv">
       <div class="eyebrow">Для HR и руководителей · 30 секунд</div>
       <h2>Что это за сайт — простыми словами</h2>
-      <p class="start-lead">Обычно аналитики показывают в портфолио скриншоты таблиц, и понять уровень специалиста сложно. <b>Здесь всё можно потрогать:</b> три работающих отчёта и калькулятор, которые я строю для бизнеса. Откройте, покрутите фильтры, посмотрите выводы — и вы сразу увидите, как человек думает и работает.</p>
+      <p class="start-lead">Обычно аналитики показывают в портфолио скриншоты таблиц, и понять уровень специалиста сложно. <b>Здесь всё можно потрогать:</b> аудит реального ассортимента по открытой выгрузке Ozon, три работающих демо-дашборда и калькулятор. Откройте, покрутите фильтры, посмотрите выводы — и вы сразу увидите, как человек думает и работает, а не будете верить на слово.</p>
 
       <div class="how-grid">
-        <div class="how"><div class="how-n">1</div><h4>Откройте любой дашборд</h4><p>Ниже три карточки: «Воронка продаж», «Юнит-экономика», «Анализ конкурентов». Жмите <b>«Открыть дашборд»</b> — отчёт откроется в новой вкладке.</p></div>
-        <div class="how"><div class="how-n">2</div><h4>Покрутите фильтры</h4><p>Меняйте период, площадку, группу товаров — цифры и графики пересчитываются мгновенно. <b>Это живой отчёт, а не просто картинки.</b></p></div>
-        <div class="how"><div class="how-n">3</div><h4>Посмотрите вердикты</h4><p>Система сама пишет по каждому товару, что делать: <b>снизить цену, удержать, вывести из ассортимента.</b> Отчёт заканчивается решениями.</p></div>
+        <div class="how"><div class="how-n">1</div><h4>Начните с аудита формы</h4><p>Единственный разбор на <b>реальных данных</b>: 434 карточки Ozon, упущенная выручка в трёх оценках, вывод по каждому SKU и переход на карточку товара.</p></div>
+        <div class="how"><div class="how-n">2</div><h4>Откройте любой дашборд</h4><p>Ниже три карточки: «Воронка продаж», «Юнит-экономика», «Анализ конкурентов». Жмите <b>«Открыть дашборд»</b> — отчёт откроется в новой вкладке.</p></div>
+        <div class="how"><div class="how-n">3</div><h4>Покрутите фильтры и расчёт</h4><p>Меняйте период, площадку, параметры SKU — цифры пересчитываются мгновенно, система сама пишет <b>вердикт: снизить цену, удержать, вывести.</b></p></div>
       </div>
 
       <div class="gloss-t">Мини-словарь · перевод с аналитического на человеческий</div>
@@ -697,7 +765,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <div class="gl"><b>Юнит-экономика</b><span>Сколько денег остаётся с одной продажи товара после всех расходов.</span></div>
         <div class="gl"><b>Воронка продаж</b><span>Путь покупателя: увидел → зашёл → корзина → купил. Показывает, где он отвалился.</span></div>
         <div class="gl"><b>ABC-анализ</b><span>Какие товары кормят компанию, а какие — балласт, который пора убрать.</span></div>
-        <div class="gl"><b>Маржа</b><span>Процент прибыли в цене товара. 18% — значит, с каждых 100 ₽ остаётся 18 ₽.</span></div>
+        <div class="gl"><b>Упущенная выручка</b><span>Сколько не заработали из-за того, что товара не было на складе при живом спросе.</span></div>
         <div class="gl"><b>ДРР</b><span>Сколько копеек рекламы сидит в каждом рубле выручки. Чем ниже — тем лучше.</span></div>
         <div class="gl"><b>Индекс цен</b><span>Мы дороже или дешевле конкурентов. 0,94 = наши цены на 6% ниже рынка.</span></div>
       </div>
@@ -710,6 +778,78 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <div class="pf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div><b>Объясняет сложное просто</b><span>Этот сайт понятен без аналитического образования. Как и мои отчёты для руководства.</span></div></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ================= АУДИТ ШКОЛЬНОЙ ФОРМЫ ================= -->
+<section id="audit">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">Разбор по реальной выгрузке · Ozon</div>
+      <h2>Аудит ассортимента школьной формы</h2>
+      <p class="sec-sub">Единственный материал портфолио на реальных данных: открытая выгрузка аналитики из личного кабинета Ozon по бренду школьной формы. Срез 19.11.2026, окно 28 дней, 434 карточки, 24 модели. Показывает, что можно вытащить из чужого ассортимента снаружи — без доступа к кабинету компании.</p>
+    </div>
+
+    <a class="audit-card rv" href="Formaschool-Audit.html" target="_blank" rel="noopener">
+      <div>
+        <div class="audit-top">
+          <span class="audit-badge">РЕАЛЬНАЯ ВЫГРУЗКА</span>
+          <span class="audit-src">Ozon · FORMASCHOOL · 28 дней</span>
+        </div>
+        <h3>Где бренд теряет деньги: склад, реклама, календарь запусков</h3>
+        <p class="audit-desc">Основной источник потерь — <b>отсутствие товара при живом спросе</b>, а не цена и не реклама. Колонка упущенной выручки площадки даёт 1,15 млн ₽, но 70 карточек имеют дни без стока и нулевую оценку: с поправкой величина вырастает до <b>2,28 млн ₽</b>, верхняя граница — 2,94 млн ₽. Все три сценария переключаются, цифры и графики пересчитываются.</p>
+
+        <div class="audit-kpis">
+          <span class="ak"><b>434</b> карточки</span>
+          <span class="ak"><b>24</b> модели</span>
+          <span class="ak"><b>28</b> дней</span>
+          <span class="ak"><b>70</b> карточек без оценки</span>
+        </div>
+
+        <ul class="audit-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Таблица выводов по всем 434 SKU:</b> фильтры, сортировка, выгрузка в CSV, клик по артикулу открывает карточку товара на Ozon.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Упущенная выручка в трёх оценках</b> и топ-10 позиций, которые её создают.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Калькулятор с поправкой на выкуп:</b> в одежде логистика платится за каждый заказ, а выручка приходит только с выкупленных.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span><b>Регламент рекламного бюджета и план работ 30 / 60 / 90</b> — что останавливать, что закупать, что готовить к сезону.</span></li>
+        </ul>
+
+        <div class="audit-cta">
+          <span class="audit-btn">Открыть аудит
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></span>
+          <span class="audit-hint">новая вкладка · 434 SKU в интерактиве</span>
+        </div>
+      </div>
+
+      <div class="audit-visual" aria-hidden="true">
+        <div class="av-t">Упущенная выручка · три оценки</div>
+        <div class="est-tiles">
+          <div class="et" style="--ec:#5B7FA6;--eg:rgba(91,127,166,.3)"><div class="et-l">База Ozon</div><div class="et-v">1,15</div><div class="et-s">млн ₽ · колонка как есть</div></div>
+          <div class="et" style="--ec:#C9A227;--eg:rgba(201,162,39,.35)"><div class="et-l">Калибровка</div><div class="et-v">2,28</div><div class="et-s">млн ₽ · поправка ×0,63</div></div>
+          <div class="et" style="--ec:#FB7185;--eg:rgba(251,113,133,.3)"><div class="et-l">Потолок</div><div class="et-v">2,94</div><div class="et-s">млн ₽ · без поправки</div></div>
+        </div>
+
+        <div class="av-t">Топ-4 позиции · база площадки</div>
+        <div class="mini-bars">
+          <div>
+            <div class="mb-head"><span class="mb-l">Брюки утеплённые · Зима<small>SKU 1728286694 · 28 из 28 дней без стока</small></span><span class="mb-v">125 208 ₽</span></div>
+            <span class="mb-track"><span class="mb-fill" style="width:100%"></span></span>
+          </div>
+          <div>
+            <div class="mb-head"><span class="mb-l">Брюки утеплённые<small>SKU 1695830684 · 28 из 28 дней без стока</small></span><span class="mb-v">113 542 ₽</span></div>
+            <span class="mb-track"><span class="mb-fill" style="width:90.7%"></span></span>
+          </div>
+          <div>
+            <div class="mb-head"><span class="mb-l">Брюки багги<small>SKU 3397133733 · 28 из 28 дней без стока</small></span><span class="mb-v">88 564 ₽</span></div>
+            <span class="mb-track"><span class="mb-fill" style="width:70.7%"></span></span>
+          </div>
+          <div>
+            <div class="mb-head"><span class="mb-l">Брюки утеплённые<small>SKU 1695830676 · 27 из 28 дней без стока</small></span><span class="mb-v">77 938 ₽</span></div>
+            <span class="mb-track"><span class="mb-fill" style="width:62.2%"></span></span>
+          </div>
+        </div>
+        <p class="av-note">Фрагмент реального блока из аудита. Внутри — топ-10, полная таблица по 434 карточкам и разбор каждой позиции.</p>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -836,7 +976,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
     <div class="sec-head rv">
       <div class="eyebrow">02 · Интерактив</div>
       <h2>Калькулятор юнит-экономики</h2>
-      <p class="sec-sub">Упрощённая модель одного SKU — по этой логике считается маржа в рабочем файле. Рабочая версия дополнительно учитывает хранение, утилизацию, обратную логистику и схемы площадок. Двигайте ползунки — всё пересчитывается мгновенно.</p>
+      <p class="sec-sub">Упрощённая модель одного SKU — по этой логике считается маржа в рабочем файле. Боевая версия дополнительно учитывает хранение, утилизацию, обратную логистику и схемы площадок. Двигайте ползунки — всё пересчитывается мгновенно.</p>
     </div>
 
     <div class="calc-grid">
@@ -986,7 +1126,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
         <div class="ben rv" style="--bc:var(--amber);--bg-glow:rgba(251,191,36,.1);transition-delay:.25s">
           <div class="ben-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
           <h4>Демо наружу, данные внутри</h4>
-          <p>Публичная версия — на вымышленных данных (как это портфолио). <b>Боевые цифры остаются в компании.</b> Один файл, без сервера и базы данных.</p>
+          <p>Публичные дашборды — на вымышленных данных. <b>Боевые цифры остаются в компании.</b> Аудит формы сделан по открытой выгрузке площадки, без доступа к чужому кабинету.</p>
         </div>
       </div>
     </div>
@@ -1028,7 +1168,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
     <div class="principles">
       <div class="pr rv"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><div><h5>Проверяемость</h5><p>Любая цифра на дашборде раскладывается до формулы и исходной строки выгрузки.</p></div></div>
       <div class="pr rv" style="transition-delay:.06s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M17 15l3 3-3 3"/></svg></span><div><h5>Отчёт заканчивается решением</h5><p>На выходе — список действий по цене, закупу и ассортименту с приоритетами.</p></div></div>
-      <div class="pr rv" style="transition-delay:.12s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><h5>Демо и рабочие данные</h5><p>Публичное портфолио — на вымышленных данных. Коммерческие показатели компаний не раскрываются.</p></div></div>
+      <div class="pr rv" style="transition-delay:.12s"><span class="pr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><h5>Демо и рабочие данные</h5><p>Дашборды — на вымышленных данных, аудит — на открытой выгрузке площадки. Коммерческие показатели компаний не раскрываются.</p></div></div>
     </div>
   </div>
 </section>
@@ -1109,7 +1249,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;margin-top:20px}
 <footer>
   <div class="wrap foot">
     <span>© <span id="year">2026</span> Шумелкин Е.А. · Портфолио собрано вручную: HTML / CSS / JS</span>
-    <span>Все цифры — демонстрационные · <a href="Excel.html" target="_blank" rel="noopener">Excel-модель .xlsx</a> · <a href="#hero">Наверх ↑</a></span>
+    <span>Дашборды — демо-данные · <a href="Formaschool-Audit.html" target="_blank" rel="noopener">аудит формы</a> — открытая выгрузка Ozon · <a href="Excel.html" target="_blank" rel="noopener">Excel-модель .xlsx</a> · <a href="#hero">Наверх ↑</a></span>
   </div>
 </footer>
 
@@ -1341,7 +1481,7 @@ applyPreset(0);
 
 /* ============ НАВИГАЦИЯ / SCROLLSPY / REVEAL / ПАРАЛЛАКС ============ */
 const header=$('#header'),toTop=$('#toTop'),aurora=$('#aurora');
-const spySecs=['start','dashboards','calculator','value','workflow','about','contact'].map(id=>document.getElementById(id));
+const spySecs=['start','audit','dashboards','calculator','value','workflow','about','contact'].map(id=>document.getElementById(id));
 const spyLinks=$$('.nav-links a[data-spy]');
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let ticking=false;
@@ -1373,12 +1513,12 @@ burger.addEventListener('click',()=>{
 });
 $$('#mPanel a').forEach(a=>a.addEventListener('click',closeMenu));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
-window.addEventListener('resize',()=>{if(window.innerWidth>920)closeMenu();});
+window.addEventListener('resize',()=>{if(window.innerWidth>980)closeMenu();});
 if('IntersectionObserver' in window){
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
   $$('.rv').forEach(el=>io.observe(el));
 }else{$$('.rv').forEach(el=>el.classList.add('in'));}
-$$('.card, .xcard').forEach(el=>{
+$$('.card, .xcard, .audit-card').forEach(el=>{
   el.addEventListener('pointermove',e=>{
     const b=el.getBoundingClientRect();
     el.style.setProperty('--mx',(e.clientX-b.left)+'px');
